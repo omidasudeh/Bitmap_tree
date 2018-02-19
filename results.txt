@@ -1,0 +1,87 @@
+asudeh.1@sl5:~/research/my_code$ ./proj 5000 5000      out5000-1-10.txt
+################ Data Generation/load ###############
+reading the file ...
+The file read successfully
+===============>
+################ Tree Generation #################
+tree generation time:2.23
+===============>
+################ Exact Query #####################
+exact spatial query result:773
+exact query time:0
+######### Bitmap-Tree Generation #################
+bitmaptree_generation_time:31.71
+======== low level bins =======>
+################ approximate Query ###############
+Approx Spatial result by bitmap tree:930
+approx query time:0
+=============================================================================
+asudeh.1@sl5:~/research/my_code$ ./proj 5000 5000      out5000-1-100.txt
+################ Data Generation/load ###############
+reading the file ...
+The file read successfully
+===============>
+################ Tree Generation #################
+tree generation time:2.19
+===============>
+################ Exact Query #####################
+exact spatial query result:9160
+exact query time:0
+######### Bitmap-Tree Generation #################
+bitmaptree_generation_time:129.17
+======== low level bins =======>
+################ approximate Query ###############
+Approx Spatial result by bitmap tree:8370
+approx query time:0
+=============================================================================
+asudeh.1@sl5:~/research/my_code$ ./proj 5000 5000      out5000-0-1000.txt
+################ Data Generation/load ###############
+===============>
+################ Tree Generation #################
+tree generation time:2.2
+===============>
+################ Exact Query #####################
+exact spatial query result:92581
+exact query time:0
+######### Bitmap-Tree Generation #################
+bitmaptree_generation_time:924.28
+======== low level bins =======>
+################ approximate Query ###############
+Approx Spatial result by bitmap tree:92070
+approx query time:0.01
+=============================================================================
+asudeh.1@sl5:~/research/my_code$ ./proj 5000 5000      out5000-0-10000.txt
+################ Data Generation/load ###############
+===============>
+################ Tree Generation #################
+tree generation time:2.24
+===============>
+################ Exact Query #####################
+exact spatial query result:932016
+exact query time:0
+######### Bitmap-Tree Generation #################
+bitmaptree_generation_time:926.38
+======== low level bins =======>
+################ approximate Query ###############
+Approx Spatial result by bitmap tree:938370
+approx query time:5.29
+==============================================================================
+asudeh.1@sl5:~/research/my_code$ ./proj 5000 5000      out5000-1-100000.txt
+################ Data Generation/load ###############
+===============>
+################ Tree Generation #################
+tree generation time:2.25
+===============>
+################ Exact Query #####################
+exact spatial query result:9298185
+exact query time:0
+######### Bitmap-Tree Generation #################
+bitmaptree_generation_time:927.38
+======== low level bins =======>
+################ approximate Query ###############
+Approx Spatial result by bitmap tree:9383700
+approx query time:5.37
+
+#########################################
+bitmaptree_generation_time: is increasing with the increase of cardinality; then converges to an upperbound value; might be because size of the matrix bound that.
+approx query time: it is also increasing upto a upperbound with the increase of cardinality
