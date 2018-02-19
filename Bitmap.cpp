@@ -164,10 +164,11 @@ Bitmap<a_type>::Bitmap(a_type* array, unsigned long items){
 		i++;
 	}*/
 	itemsCount = items;
+	cout<<"Bitmap created"<<endl;
 	cout<<"Item Counts:"<<itemsCount<<endl;
 	cout<<"number of low-level bins:"<<(*secondlevelvectors).size()<<endl;
 	cout<<"number of high-level bins:"<<(*firstlevelvectors).size()<<endl;
-
+	cout<<"======================\n";
 }
 /*
  * The destructor function

@@ -260,9 +260,9 @@ float Query_interface::BitmapQuery(vector<pair<int, int>> Pv, vector<pair<int, i
 	//============== value based filtering; lines 1-7 in 2015 paper algo.
 	vector<int> value_based_filtered_bins;
 	int i = 0;
-	for(auto elem:*(bitmap->get_firstlevelvalue()))
+	for(auto bin:*(bitmap->get_firstlevelvalue()))
 	{
-		if(rangeOverlap(pair<int, int>(elem.min_val, elem.max_val),Pv))
+		if(rangeOverlap(pair<int, int>(bin.min_val/bitmap->get_numpres(), bin.max_val/bitmap->get_numpres()),Pv))
 		{
 			value_based_filtered_bins.push_back(i);
 		}
@@ -275,12 +275,12 @@ float Query_interface::BitmapQuery(vector<pair<int, int>> Pv, vector<pair<int, i
 	vector<size_t> transalted_pd = translate(Pdx, Pdy);
 	//for(auto w:transalted_pd)
 		//cout<<w;
-	cout<<endl;
+	//cout<<endl;
 	unordered_map<int,int>* count_array = new unordered_map<int,int>;
 	for(int bin_number:value_based_filtered_bins)
 	{
 		vector<size_t> result = Bitops.logic_and(bitmap->get_firstlevelvector(bin_number),transalted_pd); // make sure to do it by reference
-		boost::dynamic_bitset<> bit_result(bitmap->get_count(),result[0]); // copy problem efficiency issue
+		boost::dynamic_bitset<> bit_result = Bitops.uncompressIndex(result, bitmap->get_count());// unefficient!!
 		count_array->insert(pair<int, int> (bin_number,bit_result.count()));  // uses the boost's count function
 	}
 	//assert(false);
@@ -297,19 +297,21 @@ float Query_interface::approximate_sum(unordered_map<int,int> * count_array)
 	for(auto elem:*count_array)
 	{
 		
-		int key = elem.first;
-		//cout<<"bin#:"<<key<<" count:"<<elem.second<<endl;
+		int binNumber = elem.first;
 		float count = (float)elem.second;
-
-		float stat_sum = bitmap->get_first_level_sum(key);
 		
-		float stat_count = bitmap->get_first_level_count(key);
+		//cout<<"bin#:"<<binNumber<<" count:"<<count<<endl;
+		
+		
+		float stat_sum = bitmap->get_first_level_sum(binNumber);
+		
+		float stat_count = bitmap->get_first_level_count(binNumber);
 		
 		approx_sum+=stat_sum*(count/stat_count);
-		//cout<<stat_sum<<"*("<<count<<"/"<<stat_count<<") = "<<stat_sum*(count/stat_count)<<endl;
+		//cout<<stat_sum<<"*("<<count<<"/"<<stat_count<<") = "<<stat_sum*(count/stat_count)<<"	curAppSum:"<<approx_sum<<endl;
 		
 	}
-	cout<<approx_sum<<endl;
+	//cout<<approx_sum<<endl;
 	return approx_sum;
 }
 bool Query_interface::rangeOverlap(pair<int, int> b, vector<pair<int,int>> Pv)
@@ -327,7 +329,7 @@ bool Query_interface::rangeOverlap(pair<int, int> b, vector<pair<int,int>> Pv)
 vector<size_t> Query_interface::translate (vector<pair<int, int>> Pdx,vector<pair<int, int>> Pdy)
 {
 	//cout<<"here2"<<endl;
-	boost::dynamic_bitset<> pd(bitmap->get_count(),0);// make an output bitvector of the size of the input data
+	boost::dynamic_bitset<> pd(bitmap->get_count());// make an output bitvector of the size of the input data
 	for(auto x_pair:Pdx )// for each partial range of x-dimension in the query
 	{
 		int x1 = x_pair.first;

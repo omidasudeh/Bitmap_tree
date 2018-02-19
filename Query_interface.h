@@ -47,3 +47,4 @@ class Query_interface {
 
 };
 #endif
+//here

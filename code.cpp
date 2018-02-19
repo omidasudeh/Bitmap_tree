@@ -576,10 +576,11 @@ cout<<"######### Aggregate-Tree Bitmap Generation #################"<<endl;
 	//dg.BFS();	
 	boost::dynamic_bitset<> Bit_representator;
 	vector<int>* aggregates = dg.BFS_max_depth(Tree_level,Bit_representator);
+	cout<<"===============>"<<endl;
 ////######################## VVVVVVVV Here! VVVVVVVV ############################
 
 Query_interface query_handler(dg.get_array(),dg.get_count(),dg.get_DimX(),dg.get_DimY(),&(aggregates->at(0)),aggregates->size(), Bit_representator);//generate the bitmaps ready to query
-int result = query_handler.Query(0,0,0,0);
+int result = query_handler.Query(0,0,1,1);
 cout<<"combined result:"<<result<<endl;
 /*
 cout<<"################ Approximate Query ###############"<<endl;
