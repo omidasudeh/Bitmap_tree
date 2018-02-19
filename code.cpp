@@ -9,8 +9,9 @@
 #include <string>
 #include "Query_interface.h"
 #define DebugMode false
-#define Tree_level 4
+#define Tree_level 1
 using namespace std;
+//not
 struct tree_node
 {
 	int value;
@@ -299,7 +300,7 @@ class DataGenerator
 				tree_node* head = Q.front();
 				Q.pop();
 				result->push_back(head->value);
-				//cout<<head->value<<"	("<<head->X1<<","<<head->Y1<<") ("<<head->X2<<","<<head->Y2<<")"<<endl;
+				cout<<head->value<<"	("<<head->X1<<","<<head->Y1<<") ("<<head->X2<<","<<head->Y2<<")"<<endl;
 				int numberOfChildren = 0;
 				if((head->first)!= NULL)
 				{
@@ -513,7 +514,7 @@ cout<<"################ Tree Generation #################"<<endl;
 	dg.generate_sum_tree();
 	t1 = clock()-t1;
 	cout<<"tree generation time:"<<((float)t1)/CLOCKS_PER_SEC<<endl;
-int R1 = dg.query_base(0,0,4,4);
+int R1 = dg.query_base(0,0,1,1);
 cout<<"exact query result:"<<R1<<endl;
 /*int rep = 1;
 
@@ -578,7 +579,7 @@ cout<<"######### Aggregate-Tree Bitmap Generation #################"<<endl;
 ////######################## VVVVVVVV Here! VVVVVVVV ############################
 
 Query_interface query_handler(dg.get_array(),dg.get_count(),dg.get_DimX(),dg.get_DimY(),&(aggregates->at(0)),aggregates->size(), Bit_representator);//generate the bitmaps ready to query
-int result = query_handler.Query(0,0,10,10);
+int result = query_handler.Query(0,0,0,0);
 cout<<"combined result:"<<result<<endl;
 /*
 cout<<"################ Approximate Query ###############"<<endl;
