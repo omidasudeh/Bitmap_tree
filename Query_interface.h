@@ -47,4 +47,3 @@ class Query_interface {
 
 };
 #endif
-//// this is a test 
