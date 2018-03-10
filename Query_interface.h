@@ -40,10 +40,15 @@ class Query_interface {
 		int  bitmap_tree_index(int node_number);
 		pair<pair<int,int>, pair<int,int>>*TreeOverlap(int x1, int y1, int x2, int y2,pair<pair<int,int>, pair<int,int>>* node_region);
 		///=================================================
+		////###################### Reporting ######################
+		int total_acccess = 0;
+		int tree_access = 0;
+		int bitmap_access = 0;
 	public:
 		Query_interface(int* array,unsigned long items, int DX,int DY,int* aggregates, unsigned long aggregate_items, boost::dynamic_bitset<> BR);
 		~Query_interface();
 		int  Query(int x1, int y1, int x2, int y2);
+		void print_access_log();
 
 };
 #endif

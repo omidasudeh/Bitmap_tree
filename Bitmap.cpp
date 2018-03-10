@@ -302,7 +302,7 @@ template <class a_type>
 pair<int,int> * Bitmap<a_type>:: get_value(int node_number)
 {
 	pair<int,int>* result = NULL; 
-	
+	// 
 	int chunk_number = node_number/chunk_size;
 	int chunk_index = node_number%chunk_size;
 	

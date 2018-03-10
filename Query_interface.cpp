@@ -1,10 +1,12 @@
 #include "Query_interface.h"
 Query_interface::Query_interface(int* array,unsigned long items, int DX,int DY,int* aggregates, unsigned long aggregate_items, boost::dynamic_bitset<> BR){
-		bitmap = new Bitmap<int>(array,items);
+		cout<<"Creating Actual bitmap ...\n";
+		bitmap = new Bitmap<int>(array,items);		
 		bitmap->calcPreAgg();
 		//bitmap->print_stat();
 		DimX = DX;
 		DimY = DY;
+		cout<<"Creating bitmap tree ...\n";
 		bitmapTree = new Bitmap<int>(aggregates,aggregate_items);
 		bitmapTree->calcPreAgg();
 		//bitmapTree->print_stat();
@@ -35,7 +37,10 @@ int Query_interface:: Query(int x1, int y1, int x2, int y2){
 }
 
 int  Query_interface::TreeQuery(int x1, int y1, int x2, int y2,int node_number,pair<pair<int,int>, pair<int,int>>* node_region){
-	
+	// cout<<"tree\n";
+	total_acccess++;
+	tree_access++;
+	// cout<<"tree query\n";
 	int X1 = node_region->first.first;
 	int Y1 = node_region->first.second;
 	int X2 = node_region->second.first;
@@ -118,7 +123,7 @@ int  Query_interface::TreeQuery(int x1, int y1, int x2, int y2,int node_number,p
 			Pdx.push_back(pair<int, int>(x1 ,x2)); 
 			vector<pair<int, int>> Pdy; 
 			Pdy.push_back(pair<int, int>(y1,y2)); 
-			//cout<<"bitmap query:"<<a1->first.first<<","<<a1->first.second<<","<<a1->second.first<<","<<a1->second.second<<","<<endl;
+			// cout<<"bitmap query:"<<a1->first.first<<","<<a1->first.second<<","<<a1->second.first<<","<<a1->second.second<<","<<endl;
 			return  BitmapQuery(Pv,Pdx,Pdy);
 			
 		}
@@ -141,7 +146,7 @@ int  Query_interface::TreeQuery(int x1, int y1, int x2, int y2,int node_number,p
 			Pdx.push_back(pair<int, int>(x1 ,x2)); 
 			vector<pair<int, int>> Pdy; 
 			Pdy.push_back(pair<int, int>(y1,y2)); 
-			//cout<<"bitmap query:"<<a1->first.first<<","<<a1->first.second<<","<<a1->second.first<<","<<a1->second.second<<","<<endl;
+			// cout<<"bitmap query:"<<a1->first.first<<","<<a1->first.second<<","<<a1->second.first<<","<<a1->second.second<<","<<endl;
 			return  BitmapQuery(Pv,Pdx,Pdy);
 			
 		}
@@ -164,7 +169,7 @@ int  Query_interface::TreeQuery(int x1, int y1, int x2, int y2,int node_number,p
 			Pdx.push_back(pair<int, int>(x1 ,x2)); 
 			vector<pair<int, int>> Pdy; 
 			Pdy.push_back(pair<int, int>(y1,y2)); 
-			//cout<<"bitmap query:"<<a1->first.first<<","<<a1->first.second<<","<<a1->second.first<<","<<a1->second.second<<","<<endl;
+			// cout<<"bitmap query:"<<a1->first.first<<","<<a1->first.second<<","<<a1->second.first<<","<<a1->second.second<<","<<endl;
 			return  BitmapQuery(Pv,Pdx,Pdy);
 		}
 	}
@@ -185,7 +190,7 @@ int  Query_interface::TreeQuery(int x1, int y1, int x2, int y2,int node_number,p
 			Pdx.push_back(pair<int, int>(x1 ,x2)); 
 			vector<pair<int, int>> Pdy; 
 			Pdy.push_back(pair<int, int>(y1,y2)); 
-			//cout<<"bitmap query:"<<a1->first.first<<","<<a1->first.second<<","<<a1->second.first<<","<<a1->second.second<<","<<endl;
+			// cout<<"bitmap query:"<<a1->first.first<<","<<a1->first.second<<","<<a1->second.first<<","<<a1->second.second<<","<<endl;
 			return  BitmapQuery(Pv,Pdx,Pdy);
 		}	
 	}
@@ -257,6 +262,9 @@ pair<pair<int,int>, pair<int,int>>* Query_interface::TreeOverlap(int x1, int y1,
 }
 float Query_interface::BitmapQuery(vector<pair<int, int>> Pv, vector<pair<int, int>> Pdx,vector<pair<int, int>> Pdy)
 {
+	// cout<<"bitmap\n";
+	total_acccess++;
+	bitmap_access++;
 	//============== value based filtering; lines 1-7 in 2015 paper algo.
 	vector<int> value_based_filtered_bins;
 	int i = 0;
@@ -353,4 +361,11 @@ vector<size_t> Query_interface::translate (vector<pair<int, int>> Pdx,vector<pai
 	}
 	//cout<<pd<<endl;
 	return Bitops.compressBitset(pd);
+}
+void Query_interface::print_access_log()
+{
+	cout<<"================ access report ===================\n";
+	cout<<"number of total access to both bitmaps: "<<total_acccess<<endl;
+	cout<<"Actual bitmap access ratio: "<<float(bitmap_access)/float(total_acccess)<<endl;
+	cout<<"Bitmap tree access ratio: "<<float(tree_access)/float(total_acccess)<<endl;	
 }

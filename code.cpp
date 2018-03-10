@@ -9,7 +9,7 @@
 #include <string>
 #include "Query_interface.h"
 #define DebugMode false
-#define Tree_level 2
+#define Tree_level 8
 using namespace std;
 //not
 struct tree_node
@@ -18,7 +18,7 @@ struct tree_node
 	int X1;
 	int Y1;
 	int X2;
-	int Y2;
+	int Y2;//333
 	int high;
 	tree_node* first = NULL;
 	tree_node* second = NULL;
@@ -34,12 +34,12 @@ class DataGenerator
 		int lowerBound;
 		int higherBound;
 		int count;// number of elements in the matrix DimX*DimY
-		//================ aggregate generation 
+		//================ aggregate generation
 		int Devision_factor = 2;
-		vector<int> aggregates;		
+		vector<int> aggregates;
 		int step = 0; //for debugging
 		tree_node* root;
-	public: 
+	public:
 		/*
 			This class is to generate a 2d dimX by dimY matrix where the values
 			are uniformly random integers ranging between lowBound and highBound.
@@ -59,7 +59,7 @@ class DataGenerator
 		*/
 		void generate()
 		{
-			srand(time(NULL));			
+			srand(time(NULL));
 			for(int i=0;i<DimX;i++)
 			{
 			vector<int> row ;
@@ -72,7 +72,7 @@ class DataGenerator
 				matrix.push_back(row);
 			}
 		}
-		
+
 		/*
 		prints the matrix
 		*/
@@ -127,21 +127,21 @@ class DataGenerator
 					vector<int> line_values;
 					int next_value;
 					while(iss>>next_value)
-					{						
+					{
 						line_values.push_back(next_value);
 						if (iss.peek() == ',')
 							iss.ignore();
 						//cout<<next_value<<"|";
 					}
 					matrix.push_back(line_values);
-					//cout<<endl;				
+					//cout<<endl;
 				}
-			cout<<"The file read successfully"<<endl;	
+			cout<<"The file read successfully"<<endl;
 			}
 			else
 				cout<<"couldn't open the file"<<endl;
 			myfile.close();
-			
+
 		}
 		/*
 		returns the actual data
@@ -152,7 +152,7 @@ class DataGenerator
 		}
 		int* get_array()
 		{
-			int* array = new int[DimX*DimY];	
+			int* array = new int[DimX*DimY];
 			for(int i=0;i<DimX;i++)
 			{
 				for(int j=0; j< DimY;j++)
@@ -182,7 +182,7 @@ class DataGenerator
 				vector<int> row;
 				for(int j = 0;j<granularity;j++)// This will skip the boarders !!
 				{
-					cout<<i<<" "<<j<<endl;
+					//cout<<i<<" "<<j<<endl;
 					row.push_back (query_base(i*Xstride,j*Ystride,(i+1)*Xstride-1,(j+1)*Ystride-1));
 				}
 				aggregate_matrix.push_back(row);
@@ -208,7 +208,7 @@ class DataGenerator
 				{
 					/* . */
 					//cout<<"case1 "<<endl;
-					
+
 					tree_node* node = new tree_node;
 					node->value = matrix[x1][y1];
 					node->X1 = x1;
@@ -219,9 +219,9 @@ class DataGenerator
 				}
 				else
 				{
-					/* __ */ 
+					/* __ */
 					//cout<<"case2"<<endl;
-					
+
 					tree_node* first = sum_helper(x1,y1,x1,yMid,matrix);
 					tree_node* second= sum_helper(x1,yMid+1,x1,y2,matrix);
 					tree_node* node = new tree_node;
@@ -240,9 +240,9 @@ class DataGenerator
 			{
 				if (y1==y2)
 				{
-					/* | */					
+					/* | */
 					//cout<<"case3"<<endl;
-					
+
 					tree_node* first = sum_helper(x1,y1,xMid,y1,matrix);
 					tree_node* third = sum_helper(xMid+1,y1,x2,y1,matrix);
 					tree_node* node = new tree_node;
@@ -260,7 +260,7 @@ class DataGenerator
 				{
 					/* + */
 					//cout<<"case4"<<endl;
-					
+
 					tree_node* first = sum_helper(x1,y1,xMid,yMid,matrix);
 					tree_node* second = sum_helper(x1,yMid+1,xMid,y2,matrix);
 					tree_node* third = sum_helper(xMid+1,y1, x2,yMid,matrix);
@@ -268,7 +268,7 @@ class DataGenerator
 
 					tree_node* node = new tree_node;
 					node->value = (first->value+second->value+third->value+forth->value);///4;
-					
+
 					node->first = first;
 					node->second = second;
 					node->third = third;
@@ -281,10 +281,10 @@ class DataGenerator
 					return node;
 				}
 			}
-			
+
 		}
 		void BFS()
-		{			
+		{
 			queue<tree_node*> Q;
 			Q.push(root);
 			while(!Q.empty())
@@ -304,7 +304,7 @@ class DataGenerator
 			cout<<endl;
 		}
 		vector<int>* BFS_max_depth(int maxDepth,boost::dynamic_bitset<>& Bit_Representor)
-		{			
+		{
 			boost::dynamic_bitset<> bit_representor;
 			//int last_full_level = log(3*count)/log(4)-1;
 			if(maxDepth<0)
@@ -312,15 +312,15 @@ class DataGenerator
 			vector<int>* result = new vector<int>;
 			queue<tree_node*> Q;
 			Q.push(root);
-			int currentDepth = 0, 
-				elementsToDepthIncrease = 1, 
+			int currentDepth = 0,
+				elementsToDepthIncrease = 1,
 				nextElementsToDepthIncrease = 0;
 			while(!Q.empty())
 			{
 				tree_node* head = Q.front();
 				Q.pop();
 				result->push_back(head->value);
-				cout<<head->value<<"	("<<head->X1<<","<<head->Y1<<") ("<<head->X2<<","<<head->Y2<<")"<<endl;
+				// cout<<head->value<<"	("<<head->X1<<","<<head->Y1<<") ("<<head->X2<<","<<head->Y2<<")"<<endl;
 				int numberOfChildren = 0;
 				if((head->first)!= NULL)
 				{
@@ -351,7 +351,7 @@ class DataGenerator
 				else{
 					//if(last_full_level == currentDepth)
 					bit_representor.push_back(0);
-					
+
 				}
 				if(head->forth!= NULL)
 				{
@@ -386,12 +386,12 @@ class DataGenerator
 		}
 		int query(int x1, int y1, int x2, int y2)
 		{
-			
+
 			step = 0;
 			int result = query_helper(x1, y1, x2, y2,root);
 			cout<<"# of getvals:"<<step<<"\n";
 			return result;
-			
+
 		}
 		int query_helper(int x1, int y1, int x2, int y2, tree_node* node)
 		{
@@ -410,7 +410,7 @@ class DataGenerator
 			float r2 = 0;
 			float r3 = 0;
 			float r4 = 0;
-			
+
 			pair<pair<int,int>, pair<int,int>>* a1 = NULL;
 			pair<pair<int,int>, pair<int,int>>* a2 = NULL;
 			pair<pair<int,int>, pair<int,int>>* a3 = NULL;
@@ -491,7 +491,7 @@ class DataGenerator
 			result->second.first = bottom_right.first;
 			result->second.second = bottom_right.second;
 			return result;
-			
+
 		}
 		int query_base(int x1, int y1, int x2, int y2)
 		{
@@ -501,23 +501,23 @@ class DataGenerator
 					sum+=matrix[i][j];
 			//return (float) sum;//((x2-x1)*(y2-y1));
 			return sum;
-				
+
 		}
-		
+
 };
 int main (int argc, char** argv)
-{ 	
+{
 ////########################## 1. Data generation ###############################
 cout<<"################ Data Generation/load ###############"<<endl;
 	//cout<<argv[1]<<"	"<<argv[2]<<endl;
-	
+
 	// select mode here ______________________________________
 	bool generate_mode = false;// 0 mean load; 1 means generate
 	//________________________________________________________
-	
+
 	DataGenerator dg (stoi(argv[1]), stoi(argv[2]), 1,10);
 	if(generate_mode){
-		dg.generate();	
+		dg.generate();
 		dg.saveAs("./"+(string)argv[3]);
 	}
 	else{
@@ -526,7 +526,7 @@ cout<<"################ Data Generation/load ###############"<<endl;
 	//dg.print();
 	cout<<"===============>"<<endl;
 
-clock_t t1,t2=0,t3=0,t4=0,sumtime=0,sumtime1=0,sumtime2=0;	
+clock_t t1,t2=0,t3=0,t4=0,sumtime=0,sumtime1=0,sumtime2=0;
 
 ////######################## 2. Generate aggregate tree #########################
 cout<<"################ Tree Generation #################"<<endl;
@@ -534,7 +534,7 @@ cout<<"################ Tree Generation #################"<<endl;
 	dg.generate_sum_tree_upto_level(Tree_level);
 	t1 = clock()-t1;
 	cout<<"tree generation time:"<<((float)t1)/CLOCKS_PER_SEC<<endl;
-int R1 = dg.query_base(0,0,1,1);
+int R1 = dg.query_base(200,550,300,650);
 cout<<"exact query result:"<<R1<<endl;
 /*int rep = 1;
 
@@ -555,7 +555,7 @@ for(int i = 0 ; i<11;i++)// increase the query size
 		R1 = dg.query_base(0,0,49*i,49*i);
 		/////baseline query
 		//R1 = dg.query_base(0,0,i,i);
-		
+
 		//cout<<R1<<"\t";
 		t2 = clock()-t2;
 		sumtime1+=t2;
@@ -582,7 +582,7 @@ for(int i = 0 ; i<11;i++)// increase the query size
 		//R = dg.query(0,0,i,i);
 		//if(j==0 )
 		cout<<"exact sum="<<R<<endl;
-		
+
 		//sumtime+=t2;
 	//}
 	//cout<<sumtime/rep<<endl;
@@ -591,19 +591,22 @@ for(int i = 0 ; i<11;i++)// increase the query size
 
 */
 
-////################### 4. Convert aggregate tree to Bitmap #####################	
+////################### 4. Convert aggregate tree to Bitmap #####################
 cout<<"######### Aggregate-Tree Bitmap Generation #################"<<endl;
 	t3 = clock();
-	//dg.BFS();	
+	//dg.BFS();
 	boost::dynamic_bitset<> Bit_representator;
 	vector<int>* aggregates = dg.BFS_max_depth(Tree_level,Bit_representator);
 	cout<<"===============>"<<endl;
 ////######################## VVVVVVVV Here! VVVVVVVV ############################
-/*
+
 Query_interface query_handler(dg.get_array(),dg.get_count(),dg.get_DimX(),dg.get_DimY(),&(aggregates->at(0)),aggregates->size(), Bit_representator);//generate the bitmaps ready to query
-int result = query_handler.Query(0,0,1,1);
+int result = query_handler.Query(200,550,300,650);
 cout<<"combined result:"<<result<<endl;
-*/
+query_handler.print_access_log();
+float error = abs(R1-result)/float(R1);
+cout<<"accuracy: "<<1-error<<endl;
+
 /*
 cout<<"################ Approximate Query ###############"<<endl;
 for(int i = 0 ; i<11;i++)// increase the query size
@@ -617,7 +620,7 @@ for(int i = 0 ; i<11;i++)// increase the query size
 	//	//Query the tree
 		int R1 = 0;
 		t2 = clock();
-		/////approximate Query 
+		/////approximate Query
 		//query_handler.query();
 		//R1 = query_handler.query(0,0,i,i,dg.get_DimX(),dg.get_DimY());
 		//R1 = query_handler.query(0,0,499*i,499*i,dg.get_DimX(),dg.get_DimY());
