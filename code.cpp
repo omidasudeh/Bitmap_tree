@@ -9,7 +9,7 @@
 #include <string>
 #include "Query_interface.h"
 #define DebugMode false
-#define Tree_level 1
+#define Tree_level 2
 using namespace std;
 //not
 struct tree_node
@@ -170,12 +170,32 @@ class DataGenerator
 		{return DimY;}
 		int get_DimX()
 		{return DimX;}
+		/*generates the top levels a quad-tree of the sum aggregate*/
+		void generate_sum_tree_upto_level(int level)
+		{
+			int granularity = 1<<level;
+			int Xstride = DimX / granularity;
+			int Ystride = DimY / granularity;
+			vector< vector<int> > aggregate_matrix;
+			for(int i = 0; i<granularity; i++) // This will skip the boarders !!
+			{
+				vector<int> row;
+				for(int j = 0;j<granularity;j++)// This will skip the boarders !!
+				{
+					cout<<i<<" "<<j<<endl;
+					row.push_back (query_base(i*Xstride,j*Ystride,(i+1)*Xstride-1,(j+1)*Ystride-1));
+				}
+				aggregate_matrix.push_back(row);
+			}
+			root = sum_helper(0,0,granularity-1,granularity-1,aggregate_matrix);
+		}
+
 		/*generates a quad-tree of the sum aggregate*/
 		void generate_sum_tree()
 		{
-			root = sum_helper(0,0,DimX-1,DimY-1);
+			root = sum_helper(0,0,DimX-1,DimY-1,matrix);
 		}
-		tree_node* sum_helper(int x1, int y1, int x2, int y2)
+		tree_node* sum_helper(int x1, int y1, int x2, int y2,vector< vector<int> > matrix )
 		{
 			/*step++;
 			assert(step != 50);*/
@@ -202,8 +222,8 @@ class DataGenerator
 					/* __ */ 
 					//cout<<"case2"<<endl;
 					
-					tree_node* first = sum_helper(x1,y1,x1,yMid);
-					tree_node* second= sum_helper(x1,yMid+1,x1,y2);
+					tree_node* first = sum_helper(x1,y1,x1,yMid,matrix);
+					tree_node* second= sum_helper(x1,yMid+1,x1,y2,matrix);
 					tree_node* node = new tree_node;
 					node->value = (first->value+second->value);///2;
 					node->first = first;
@@ -223,8 +243,8 @@ class DataGenerator
 					/* | */					
 					//cout<<"case3"<<endl;
 					
-					tree_node* first = sum_helper(x1,y1,xMid,y1);
-					tree_node* third = sum_helper(xMid+1,y1,x2,y1);
+					tree_node* first = sum_helper(x1,y1,xMid,y1,matrix);
+					tree_node* third = sum_helper(xMid+1,y1,x2,y1,matrix);
 					tree_node* node = new tree_node;
 					node->value = (first->value+third->value);///2;
 					node->first = first;
@@ -241,10 +261,10 @@ class DataGenerator
 					/* + */
 					//cout<<"case4"<<endl;
 					
-					tree_node* first = sum_helper(x1,y1,xMid,yMid);
-					tree_node* second = sum_helper(x1,yMid+1,xMid,y2);
-					tree_node* third = sum_helper(xMid+1,y1, x2,yMid);
-					tree_node* forth = sum_helper(xMid+1,yMid+1,x2,y2);
+					tree_node* first = sum_helper(x1,y1,xMid,yMid,matrix);
+					tree_node* second = sum_helper(x1,yMid+1,xMid,y2,matrix);
+					tree_node* third = sum_helper(xMid+1,y1, x2,yMid,matrix);
+					tree_node* forth = sum_helper(xMid+1,yMid+1,x2,y2,matrix);
 
 					tree_node* node = new tree_node;
 					node->value = (first->value+second->value+third->value+forth->value);///4;
@@ -511,7 +531,7 @@ clock_t t1,t2=0,t3=0,t4=0,sumtime=0,sumtime1=0,sumtime2=0;
 ////######################## 2. Generate aggregate tree #########################
 cout<<"################ Tree Generation #################"<<endl;
 	t1 = clock();
-	dg.generate_sum_tree();
+	dg.generate_sum_tree_upto_level(Tree_level);
 	t1 = clock()-t1;
 	cout<<"tree generation time:"<<((float)t1)/CLOCKS_PER_SEC<<endl;
 int R1 = dg.query_base(0,0,1,1);
@@ -570,6 +590,7 @@ for(int i = 0 ; i<11;i++)// increase the query size
 }
 
 */
+
 ////################### 4. Convert aggregate tree to Bitmap #####################	
 cout<<"######### Aggregate-Tree Bitmap Generation #################"<<endl;
 	t3 = clock();
@@ -578,10 +599,11 @@ cout<<"######### Aggregate-Tree Bitmap Generation #################"<<endl;
 	vector<int>* aggregates = dg.BFS_max_depth(Tree_level,Bit_representator);
 	cout<<"===============>"<<endl;
 ////######################## VVVVVVVV Here! VVVVVVVV ############################
-
+/*
 Query_interface query_handler(dg.get_array(),dg.get_count(),dg.get_DimX(),dg.get_DimY(),&(aggregates->at(0)),aggregates->size(), Bit_representator);//generate the bitmaps ready to query
 int result = query_handler.Query(0,0,1,1);
 cout<<"combined result:"<<result<<endl;
+*/
 /*
 cout<<"################ Approximate Query ###############"<<endl;
 for(int i = 0 ; i<11;i++)// increase the query size
