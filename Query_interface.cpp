@@ -19,17 +19,21 @@ Query_interface::~Query_interface(){
 	delete bitmap;
 	}
 
-int Query_interface:: Query(int x1, int y1, int x2, int y2){
-	pair<pair<int,int>, pair<int,int>>* root_region = new pair<pair<int,int>, pair<int,int>>;
-	root_region->first.first   = 0;
-	root_region->first.second  = 0;	
-	root_region->second.first  = DimX-1;
-	root_region->second.second = DimY-1;
+int Query_interface:: Query(pair<point,point> query_region){
+	// pair<point, point>* root_region = new pair<point,point>;
+	pair<point, point> root_region;
+	root_region.first.x   = 0;
+	root_region.first.y   = 0;
+	root_region.first.z   = 0;	
+
+	root_region.second.x  = DimX-1;
+	root_region.second.y  = DimY-1;
+	root_region.second.z  = DimZ-1;	
 	
 	//k0=0;
 	//gtt = 0;
 	//clock_t tq = clock(); 
-	int result = TreeQuery(x1, y1, x2, y2,0,root_region);
+	int result = TreeQuery(query_region,0,root_region);
 	//gtt += clock()-tq;
 	//cout<<"\ngtt:"<<gtt<<endl;
 	//cout<<"# of getvals:"<<k0<<endl;
@@ -37,18 +41,22 @@ int Query_interface:: Query(int x1, int y1, int x2, int y2){
 
 }
 
-int  Query_interface::TreeQuery(int x1, int y1, int x2, int y2,int node_number,pair<pair<int,int>, pair<int,int>>* node_region){
+int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, pair<point, point> node_region){
 	// cout<<"tree\n";
 	total_acccess++;
 	tree_access++;
 	// cout<<"tree query\n";
-	int X1 = node_region->first.first;
-	int Y1 = node_region->first.second;
-	int X2 = node_region->second.first;
-	int Y2 = node_region->second.second;
+	int X1 = node_region.first.x;
+	int Y1 = node_region.first.y;
+	int Z1 = node_region.first.z;
+
+	int X2 = node_region.second.x;
+	int Y2 = node_region.second.y;
+	int Z2 = node_region.second.z;
+	
 	
 	//// if(match(query,region))
-	if(x1 == X1 && y1 == Y1 && x2 == X2 && y2 == Y2) // base case: if the query region match the node area
+	if(query_region == node_region) // base case: if the query region match the node area
 	{
 		//clock_t tq = clock(); /////bottle neck!!!!!!!!!!!!!!!!!!!!
 		pair<int,int>* node_min_max = bitmapTree->get_value(node_number);// get the bin statistic e.g. : [min:2,max: 10]
@@ -57,64 +65,122 @@ int  Query_interface::TreeQuery(int x1, int y1, int x2, int y2,int node_number,p
 		return node_value;
 	}	
 	/*calculate the node number of the possible children*/
-	int first_child_tree_index = 4*node_number+1;
+	int first_child_tree_index = 8*node_number+1;
 	int first_child = bitmap_tree_index(first_child_tree_index);
 
-	int second_child_tree_index= 4*node_number+2;
+	int second_child_tree_index= 8*node_number+2;
 	int second_child = bitmap_tree_index(second_child_tree_index);
 	
-	int third_child_tree_index = 4*node_number+3;
+	int third_child_tree_index = 8*node_number+3;
 	int third_child = bitmap_tree_index(third_child_tree_index);
 	
-	int forth_child_tree_index = 4*node_number+4;
+	int forth_child_tree_index = 8*node_number+4;
 	int forth_child = bitmap_tree_index(forth_child_tree_index);
+
+	int fifth_child_tree_index = 8*node_number+5;
+	int fifth_child = bitmap_tree_index(first_child_tree_index);
+
+	int sixth_child_tree_index= 8*node_number+6;
+	int sixth_child = bitmap_tree_index(second_child_tree_index);
+	
+	int seventh_child_tree_index = 8*node_number+7;
+	int seventh_child = bitmap_tree_index(third_child_tree_index);
+	
+	int eighth_child_tree_index = 8*node_number+8;
+	int eighth_child = bitmap_tree_index(forth_child_tree_index);
 	
 	//===========================================
 	/*calculate the node region of the possible children*/
 	int XMid = (X1+X2)/2;
 	int YMid = (Y1+Y2)/2;
-	pair<pair<int,int>, pair<int,int>>* first_child_region = new pair<pair<int,int>, pair<int,int>> ;//(x1,y1,xMid,yMid)
-	first_child_region->first.first   = X1;
-	first_child_region->first.second  = Y1;	
-	first_child_region->second.first  = XMid;
-	first_child_region->second.second = YMid;
-	pair<pair<int,int>, pair<int,int>>* second_child_region = new pair<pair<int,int>, pair<int,int>>;//x1,yMid+1,xMid,y2
-	second_child_region->first.first   = X1;
-	second_child_region->first.second  = YMid+1;	
-	second_child_region->second.first  = XMid;
-	second_child_region->second.second = Y2;
-	pair<pair<int,int>, pair<int,int>>* third_child_region = new pair<pair<int,int>, pair<int,int>>;//(xMid+1,y1, x2,yMid)
-	third_child_region->first.first   = XMid+1;
-	third_child_region->first.second  = Y1;	
-	third_child_region->second.first  = X2;
-	third_child_region->second.second = YMid;
-	pair<pair<int,int>, pair<int,int>>* forth_child_region = new pair<pair<int,int>, pair<int,int>>;//(xMid+1,yMid+1,x2,y2);
-	forth_child_region->first.first   = XMid+1;
-	forth_child_region->first.second  = YMid+1;	
-	forth_child_region->second.first  = X2;
-	forth_child_region->second.second = Y2;
+	int ZMid = (Y1+Y2)/2;
+	pair<point,point>  first_child_region; ;//(x1,y1,xMid,yMid)
+	first_child_region.first.x  = X1;
+	first_child_region.first.y  = Y1;
+	first_child_region.first.z  = Z1;	
+	first_child_region.second.x = XMid;
+	first_child_region.second.y = YMid;
+	first_child_region.second.z = ZMid;
+	
+	pair<point,point>  second_child_region;//x1,yMid+1,xMid,y2
+	second_child_region.first.x  = X1;
+	second_child_region.first.y  = Y1;
+	second_child_region.first.z  = ZMid+1;	
+	second_child_region.second.x = XMid;
+	second_child_region.second.y = YMid;
+	second_child_region.second.z = Z2;
+
+	pair<point,point> third_child_region;//(xMid+1,y1, x2,yMid)
+	third_child_region.first.x  = X1;
+	third_child_region.first.y  = YMid+1;
+	third_child_region.first.z  = Z1;	
+	third_child_region.second.x = XMid;
+	third_child_region.second.y = Y2;
+	third_child_region.second.z = ZMid;
+	
+	pair<point,point>  forth_child_region;//(xMid+1,yMid+1,x2,y2);
+	forth_child_region.first.x  = X1;
+	forth_child_region.first.y  = YMid+1;
+	forth_child_region.first.z  = ZMid+1;	
+	forth_child_region.second.x = XMid;
+	forth_child_region.second.y = Y2;
+	forth_child_region.second.z = Z2;
+		
+	pair<point,point>  fifth_child_region; ;//(x1,y1,xMid,yMid)
+	fifth_child_region.first.x  = XMid+1;
+	fifth_child_region.first.y  = Y1;
+	fifth_child_region.first.z  = Z1;	
+	fifth_child_region.second.x = X2;
+	fifth_child_region.second.y = YMid;
+	fifth_child_region.second.z = ZMid;
+	
+	pair<point,point>  sixth_child_region;//x1,yMid+1,xMid,y2
+	sixth_child_region.first.x  = XMid+1;
+	sixth_child_region.first.y  = Y1;
+	sixth_child_region.first.z  = ZMid+1;	
+	sixth_child_region.second.x = X2;
+	sixth_child_region.second.y = YMid;
+	sixth_child_region.second.z = Z2;
+
+	pair<point,point> seventh_child_region;//(xMid+1,y1, x2,yMid)
+	seventh_child_region.first.x  = XMid+1;
+	seventh_child_region.first.y  = YMid+1;
+	seventh_child_region.first.z  = Z1;	
+	seventh_child_region.second.x = X2;
+	seventh_child_region.second.y = Y2;
+	seventh_child_region.second.z = ZMid;
+	
+	pair<point,point>  eighth_child_region;//(xMid+1,yMid+1,x2,y2);
+	eighth_child_region.first.x  = XMid+1;
+	eighth_child_region.first.y  = YMid+1;
+	eighth_child_region.first.z  = ZMid+1;	
+	eighth_child_region.second.x = X2;
+	eighth_child_region.second.y = Y2;
+	eighth_child_region.second.z = Z2;
 	
 	//// subqueries results
 	int r1 = 0;
 	int r2 = 0;
 	int r3 = 0;
 	int r4 = 0;
+	int r5 = 0;
+	int r6 = 0;
+	int r7 = 0;
+	int r8 = 0;
 	///// sub regions. set them null as default
-	pair<pair<int,int>, pair<int,int>>* a1 = NULL;
-	pair<pair<int,int>, pair<int,int>>* a2 = NULL;
-	pair<pair<int,int>, pair<int,int>>* a3 = NULL;
-	pair<pair<int,int>, pair<int,int>>* a4 = NULL;
+	pair<point,point> a1,a2,a3,a4,a5,a6,a7,a8;
+	
 	//// calculate the subqury regions for the children
 	//cout<<"first_child:" <<first_child<<endl;
 	
-	a1 = TreeOverlap(x1, y1, x2, y2, first_child_region);
+	a1 = TreeOverlap(query_region, first_child_region);
 	//cout<<x1<<","<< y1<<","<< x2<<"," <<y2<<","<<first_child_region->first.first<<","<<first_child_region->first.second<<","<<
 		//first_child_region->second.first<<","<<first_child_region->second.second<<endl;
 	if(a1!=NULL)
 	{
 		if(first_child>0) // if the first_child exists
 		{
-			r1 = TreeQuery((a1->first).first,(a1->first).second,(a1->second).first,(a1->second).second, first_child,first_child_region);
+			r1 = TreeQuery(a1, first_child,first_child_region);
 		}
 		else
 		{
@@ -130,14 +196,14 @@ int  Query_interface::TreeQuery(int x1, int y1, int x2, int y2,int node_number,p
 		}
 	}
 	
-	a2 = TreeOverlap(x1, y1, x2, y2, second_child_region);
+	a2 = TreeOverlap(query_region, second_child_region);
 	//cout<<x1<<","<< y1<<","<< x2<<"," <<y2<<","<<second_child_region->first.first<<","<<second_child_region->first.second<<","<<
 		//second_child_region->second.first<<","<<second_child_region->second.second<<endl;
 	if(a2!=NULL)
 	{
 		if(second_child>0) // if the second_child exists
 		{
-			r2 = TreeQuery((a2->first).first,(a2->first).second,(a2->second).first,(a2->second).second, second_child,second_child_region);
+			r2 = TreeQuery(a2, second_child,second_child_region);
 		}
 		else
 		{
@@ -153,14 +219,14 @@ int  Query_interface::TreeQuery(int x1, int y1, int x2, int y2,int node_number,p
 		}
 	}
 	
-	a3 = TreeOverlap(x1, y1, x2, y2, third_child_region);
+	a3 = TreeOverlap(query_region, third_child_region);
 	//cout<<x1<<","<< y1<<","<< x2<<"," <<y2<<","<<third_child_region->first.first<<","<<third_child_region->first.second<<","<<
 		//third_child_region->second.first<<","<<third_child_region->second.second<<endl;
 	if(a3!=NULL)
 	{
 		if(third_child>0) // if the third_child exists
 		{		
-			r3 = TreeQuery((a3->first).first,(a3->first).second,(a3->second).first,(a3->second).second, third_child,third_child_region);
+			r3 = TreeQuery(a3, third_child,third_child_region);
 		}
 		else
 		{
@@ -174,14 +240,14 @@ int  Query_interface::TreeQuery(int x1, int y1, int x2, int y2,int node_number,p
 			return  BitmapQuery(Pv,Pdx,Pdy);
 		}
 	}
-	a4 = TreeOverlap(x1, y1, x2, y2, forth_child_region);
+	a4 = TreeOverlap(query_region, forth_child_region);
 	//cout<<x1<<","<< y1<<","<< x2<<"," <<y2<<","<<forth_child_region->first.first<<","<<forth_child_region->first.second<<","<<
 		//forth_child_region->second.first<<","<<forth_child_region->second.second<<endl;
 	if(a4!=NULL)
 	{
 		if(forth_child>0) // if the fourth_child exists
 		{	
-			r4 = TreeQuery((a4->first).first,(a4->first).second,(a4->second).first,(a4->second).second, forth_child,forth_child_region);
+			r4 = TreeQuery(a4, forth_child,forth_child_region);
 		}
 		else
 		{
@@ -197,7 +263,7 @@ int  Query_interface::TreeQuery(int x1, int y1, int x2, int y2,int node_number,p
 	}
 	//cout<<r1<<" "<<r2<<" "<<r3<<" "<<r4<<" "<<r1+r2+r3+r4<<endl;
 	//assert(false);
-	return r1+r2+r3+r4;
+	return r1+r2+r3+r4+r5+r6+r7+r8;
 }
 
 int Query_interface::bitmap_tree_index(int node_number){
@@ -231,7 +297,7 @@ int Query_interface::bitmap_tree_index(int node_number){
 
 	return  index;
 }
-pair<pair<int,int>, pair<int,int>>* Query_interface::TreeOverlap(int x1, int y1, int x2, int y2,pair<pair<int,int>, pair<int,int>>* node_region)
+pair<point, point> Query_interface::TreeOverlap(pair<point, point> query_region,pair<point, point> node_region)
 {
 	//// calculate the subqury regions for the children
 

@@ -3,6 +3,15 @@
 
 #include "Bitmap.h"
 using namespace std;
+struct point
+{
+	int x = 0;
+	int y = 0;
+	int z = 0;
+	bool operator ==(point p) {
+		return (x == p.x) && (y == p.y) && (z == p.z);
+	}
+};
 class Query_interface {
 	private:
 		Bitmap<int>* bitmap;	
@@ -37,9 +46,9 @@ class Query_interface {
 		vector<size_t> compressed_Bit_representator;
 		boost::dynamic_bitset<> Bit_representator;
 		////---------------------- methods
-		int  TreeQuery(int x1, int y1, int x2, int y2,int node_number,pair<pair<int,int>, pair<int,int>>* node_region);
+		int  TreeQuery(pair<point,point> query_region,int node_number, pair<point, point>  node_region);
 		int  bitmap_tree_index(int node_number);
-		pair<pair<int,int>, pair<int,int>>*TreeOverlap(int x1, int y1, int x2, int y2,pair<pair<int,int>, pair<int,int>>* node_region);
+		pair<pair<int,int>, pair<int,int>>*TreeOverlap(pair<point, point> query_region,pair<point, point> node_region);
 		///=================================================
 		////###################### Reporting ######################
 		int total_acccess = 0;
@@ -48,7 +57,7 @@ class Query_interface {
 	public:
 		Query_interface(int* array,unsigned long items, int DX,int DY, int DZ,int* aggregates, unsigned long aggregate_items, boost::dynamic_bitset<> BR);
 		~Query_interface();
-		int  Query(int x1, int y1, int x2, int y2);
+		int  Query(pair<point,point> query_region);
 		void print_access_log();
 
 };

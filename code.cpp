@@ -10,7 +10,6 @@
 #include "Query_interface.h"
 #define DebugMode false
 using namespace std;
-//not
 struct tree_node
 {
 	int value; // this should be size_t
@@ -756,6 +755,7 @@ cout<<"#################################################"<<endl;
 	int x2 = 128;
 	int y2 = 128;
 	int z2 =128;
+	pair<point,point> query_region;
 	for (int i = 1; i < argc; i++) 
 	{
 		string arg = argv[i];
@@ -783,12 +783,12 @@ cout<<"#################################################"<<endl;
 		}
 		if(arg == "--Query")
 		{
-			i++; x1 = stoi(argv[i]);
-			i++; y1 = stoi(argv[i]);
-			i++; z1 = stoi(argv[i]);
-			i++; x2 = stoi(argv[i]);
-			i++; y2 = stoi(argv[i]);
-			i++; z2 = stoi(argv[i]);
+			i++; query_region.first.x = stoi(argv[i]);
+			i++; query_region.first.y = stoi(argv[i]);
+			i++; query_region.first.z = stoi(argv[i]);
+			i++; query_region.second.x = stoi(argv[i]);
+			i++; query_region.second.y = stoi(argv[i]);
+			i++; query_region.second.z = stoi(argv[i]);
 		}
 	}
 	cout<<"\n#################################################"<<endl;	
@@ -797,9 +797,10 @@ cout<<"#################################################"<<endl;
 	cout<<"--dimSize:"<<dimSize<<endl;
 	cout<< "--directory:"<<directory<<endl;
 	cout<<"--TreeLevel:"<<Tree_level<<endl;
-	cout<<"--Query: ("<<x1<<","<<y1<<","<<z1<<") ("<<x2<<","<<y2<<","<<z2<<")"<<endl;
+	cout<<"--Query: ("<<query_region.first.x<<","<<query_region.first.y<<","<<query_region.first.z<<") ("
+					  <<query_region.second.x<<","<<query_region.second.y<<","<<query_region.second.z<<")"<<endl;
 ////########################## 1. Data generation ###############################
-cout<<"\n################ Data Generation/load #############"<<endl;
+cout<<"\n############## Data Generation/load #############"<<endl;
 	DataGenerator dg (dimSize, dimSize,dimSize, 0,cardinality);
 	if(generate_mode){
 		dg.generate();
@@ -810,7 +811,7 @@ cout<<"\n################ Data Generation/load #############"<<endl;
 	}
 ////######################## 2. Generate aggregate tree #########################
 clock_t t1,t2=0,t3=0,t4=0,sumtime=0,sumtime1=0,sumtime2=0;
-cout<<"################ Tree Generation #################"<<endl;
+cout<<"############### Tree Generation #################"<<endl;
 	t1 = clock();
 	dg.generate_sum_tree_upto_level(Tree_level);
 	t1 = clock()-t1;
@@ -818,6 +819,7 @@ cout<<"################ Tree Generation #################"<<endl;
 	// dg.BFS();
 
 int R1 = dg.query_base(x1,y1,z1,x2,y2,z2);
+cout<<"\n#################################################"<<endl;	
 cout<<"exact query result:"<<R1<<endl;
 int rep = 1;
 /*
@@ -873,19 +875,24 @@ for(int i = 0 ; i<11;i++)// increase the query size
 }
 */
 ////################### 3. Convert aggregate tree to array #####################
-cout<<"######### preparing Aggregate-Tree for Bitmap Generation #################"<<endl;
+cout<<"\n#################################################"<<endl;	
+cout<<"preparing Aggregate-Tree for Bitmap Generation"<<endl;
 	t3 = clock();
 	//dg.BFS();
 	boost::dynamic_bitset<> Bit_representator;
 	vector<int>* aggregates = dg.BFS_max_depth(Tree_level,Bit_representator);
-	cout<<"===============>"<<endl;
 ////################### 4. Convert aggregate tree to Bitmap #####################
-cout<<"######### Aggregate-Tree Bitmap Generation #################"<<endl;
+cout<<"\n#################################################"<<endl;	
+cout<<"Aggregate-Tree Bitmap Generation"<<endl;
 ////######################## VVVVVVVV Here! VVVVVVVV ############################
 
-Query_interface query_handler(dg.get_array(),dg.get_count(),dg.get_DimX(),dg.get_DimY(),dg.get_DimZ(),&(aggregates->at(0)),aggregates->size(), Bit_representator);//generate the bitmaps ready to query
-/*int result = query_handler.Query(x1,y1,z1,x2,y2,z2);
+Query_interface query_handler(dg.get_array(),dg.get_count(),dg.get_DimX(),dg.get_DimY(),dg.get_DimZ(),
+								&(aggregates->at(0)),aggregates->size(), Bit_representator);//generate the bitmaps ready to query
+
+/*
+int result = query_handler.Query(query_region);
 cout<<"combined result:"<<result<<endl;
+
 query_handler.print_access_log();
 float error = abs(R1-result)/float(R1);
 cout<<"accuracy: "<<1-error<<endl;
