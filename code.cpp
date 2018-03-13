@@ -13,7 +13,7 @@ using namespace std;
 //not
 struct tree_node
 {
-	size_t value;
+	int value; // this should be size_t
 	
 	int X1;
 	int Y1;
@@ -483,87 +483,136 @@ class DataGenerator
 			}
 			cout<<endl;
 		}
-		// vector<int>* BFS_max_depth(int maxDepth,boost::dynamic_bitset<>& Bit_Representor)
-		// {
-		// 	boost::dynamic_bitset<> bit_representor;
-		// 	//int last_full_level = log(3*count)/log(4)-1;
-		// 	if(maxDepth<0)
-		// 		return NULL;
-		// 	vector<int>* result = new vector<int>;
-		// 	queue<tree_node*> Q;
-		// 	Q.push(root);
-		// 	int currentDepth = 0,
-		// 		elementsToDepthIncrease = 1,
-		// 		nextElementsToDepthIncrease = 0;
-		// 	while(!Q.empty())
-		// 	{
-		// 		tree_node* head = Q.front();
-		// 		Q.pop();
-		// 		result->push_back(head->value);
-		// 		// cout<<head->value<<"	("<<head->X1<<","<<head->Y1<<") ("<<head->X2<<","<<head->Y2<<")"<<endl;
-		// 		int numberOfChildren = 0;
-		// 		if((head->first)!= NULL)
-		// 		{
-		// 			numberOfChildren++;
-		// 			//if(last_full_level == currentDepth)
-		// 			bit_representor.push_back(1);
-		// 		}
-		// 		else{
-		// 			//if(last_full_level == currentDepth)
-		// 			bit_representor.push_back(0);
-		// 		}
-		// 		if(head->second!= NULL)
-		// 		{
-		// 			numberOfChildren++;
-		// 			//if(last_full_level == currentDepth)
-		// 			bit_representor.push_back(1);
-		// 		}
-		// 		else{
-		// 			//if(last_full_level == currentDepth)
-		// 			bit_representor.push_back(0);
-		// 		}
-		// 		if(head->third!= NULL)
-		// 		{
-		// 			numberOfChildren++;
-		// 			//if(last_full_level == currentDepth)
-		// 			bit_representor.push_back(1);
-		// 		}
-		// 		else{
-		// 			//if(last_full_level == currentDepth)
-		// 			bit_representor.push_back(0);
+		vector<int>* BFS_max_depth(int maxDepth,boost::dynamic_bitset<>& Bit_Representor)
+		{
+			boost::dynamic_bitset<> bit_representor;
+			//int last_full_level = log(3*count)/log(4)-1;
+			if(maxDepth<0)
+				return NULL;
+			vector<int>* result = new vector<int>; // this should be size_t
+			queue<tree_node*> Q;
+			Q.push(root);
+			int currentDepth = 0,
+				elementsToDepthIncrease = 1,
+				nextElementsToDepthIncrease = 0;
+			while(!Q.empty())
+			{
+				tree_node* head = Q.front();
+				Q.pop();
+				result->push_back(head->value);
+				// cout<<head->value<<"	("<<head->X1<<","<<head->Y1<<") ("<<head->X2<<","<<head->Y2<<")"<<endl;
+				int numberOfChildren = 0;
+				if((head->first)!= NULL)
+				{
+					numberOfChildren++;
+					//if(last_full_level == currentDepth)
+					bit_representor.push_back(1);
+				}
+				else{
+					//if(last_full_level == currentDepth)
+					bit_representor.push_back(0);
+				}
+				if(head->second!= NULL)
+				{
+					numberOfChildren++;
+					//if(last_full_level == currentDepth)
+					bit_representor.push_back(1);
+				}
+				else{
+					//if(last_full_level == currentDepth)
+					bit_representor.push_back(0);
+				}
+				if(head->third!= NULL)
+				{
+					numberOfChildren++;
+					//if(last_full_level == currentDepth)
+					bit_representor.push_back(1);
+				}
+				else{
+					//if(last_full_level == currentDepth)
+					bit_representor.push_back(0);
 
-		// 		}
-		// 		if(head->forth!= NULL)
-		// 		{
-		// 			numberOfChildren++;
-		// 			//if(last_full_level == currentDepth)
-		// 			bit_representor.push_back(1);
-		// 		}
-		// 		else{
-		// 			//if(last_full_level == currentDepth)
-		// 			bit_representor.push_back(0);
-		// 		}
-		// 		nextElementsToDepthIncrease += numberOfChildren;
-		// 		if (--elementsToDepthIncrease == 0) {
-		// 		  if (++currentDepth > maxDepth) return result;
-		// 		  elementsToDepthIncrease = nextElementsToDepthIncrease;
-		// 		  nextElementsToDepthIncrease = 0;
-		// 		}
-		// 		if((head->first)!= NULL)
-		// 			Q.push(head->first);
-		// 		if(head->second!= NULL)
-		// 			Q.push(head->second);
-		// 		if(head->third!= NULL)
-		// 			Q.push(head->third);
-		// 		if(head->forth!= NULL)
-		// 			Q.push(head->forth);
+				}
+				if(head->forth!= NULL)
+				{
+					numberOfChildren++;
+					//if(last_full_level == currentDepth)
+					bit_representor.push_back(1);
+				}
+				else{
+					//if(last_full_level == currentDepth)
+					bit_representor.push_back(0);
+				}
+				if((head->fifth)!= NULL)
+				{
+					numberOfChildren++;
+					//if(last_full_level == currentDepth)
+					bit_representor.push_back(1);
+				}
+				else{
+					//if(last_full_level == currentDepth)
+					bit_representor.push_back(0);
+				}
+				if(head->sixth!= NULL)
+				{
+					numberOfChildren++;
+					//if(last_full_level == currentDepth)
+					bit_representor.push_back(1);
+				}
+				else{
+					//if(last_full_level == currentDepth)
+					bit_representor.push_back(0);
+				}
+				if(head->seventh!= NULL)
+				{
+					numberOfChildren++;
+					//if(last_full_level == currentDepth)
+					bit_representor.push_back(1);
+				}
+				else{
+					//if(last_full_level == currentDepth)
+					bit_representor.push_back(0);
 
-		// 	}
-		// 	Bit_Representor = bit_representor;
-		// 	//cout<<"bit representor: "<<bit_representor<<" size:"<<bit_representor.size()<<endl;
-		// 	//cout<<result->at(0)<<"	"<<result->at(result->size()-1)<<endl;
-		// 	return result;
-		// }
+				}
+				if(head->eighth!= NULL)
+				{
+					numberOfChildren++;
+					//if(last_full_level == currentDepth)
+					bit_representor.push_back(1);
+				}
+				else{
+					//if(last_full_level == currentDepth)
+					bit_representor.push_back(0);
+
+				}
+				nextElementsToDepthIncrease += numberOfChildren;
+				if (--elementsToDepthIncrease == 0) {
+				  if (++currentDepth > maxDepth) return result;
+				  elementsToDepthIncrease = nextElementsToDepthIncrease;
+				  nextElementsToDepthIncrease = 0;
+				}
+				if((head->first)!= NULL)
+					Q.push(head->first);
+				if(head->second!= NULL)
+					Q.push(head->second);
+				if(head->third!= NULL)
+					Q.push(head->third);
+				if(head->forth!= NULL)
+					Q.push(head->forth);
+				if((head->fifth)!= NULL)
+					Q.push(head->fifth);
+				if(head->sixth!= NULL)
+					Q.push(head->sixth);
+				if(head->seventh!= NULL)
+					Q.push(head->seventh);
+				if(head->eighth!= NULL)
+					Q.push(head->eighth);
+			}
+			Bit_Representor = bit_representor;
+			//cout<<"bit representor: "<<bit_representor<<" size:"<<bit_representor.size()<<endl;
+			//cout<<result->at(0)<<"	"<<result->at(result->size()-1)<<endl;
+			return result;
+		}
 		// int query(int x1, int y1, int x2, int y2)
 		// {
 
@@ -687,7 +736,8 @@ class DataGenerator
 };
 int main (int argc, char** argv)
 {
-	cout<<"#################################################"<<endl;		
+////########################## 0. User interations ##############################
+cout<<"#################################################"<<endl;		
 	cout<<"Usage:"<<endl;
 	cout<<"./proj [--generate 100]<--dimSize 512><--directory ./>[--TreeLevel 1][--Query 0 0 0 128 128 128] \n";
 	cout<<"--generate: generates a random matrix; default is false; generate needs cardinality next after it; default cardinality is 100"<<endl;
@@ -742,7 +792,7 @@ int main (int argc, char** argv)
 		}
 	}
 	cout<<"\n#################################################"<<endl;	
-	cout<< "arguments:\n";
+	cout<< "Parameters set to:\n";
 	cout<< "--generate:"<<generate_mode<<" cardinality: "<<cardinality<<endl;
 	cout<<"--dimSize:"<<dimSize<<endl;
 	cout<< "--directory:"<<directory<<endl;
@@ -758,21 +808,19 @@ cout<<"\n################ Data Generation/load #############"<<endl;
 	else{
 		dg.load(directory);
 	}
-
-clock_t t1,t2=0,t3=0,t4=0,sumtime=0,sumtime1=0,sumtime2=0;
-
 ////######################## 2. Generate aggregate tree #########################
+clock_t t1,t2=0,t3=0,t4=0,sumtime=0,sumtime1=0,sumtime2=0;
 cout<<"################ Tree Generation #################"<<endl;
 	t1 = clock();
 	dg.generate_sum_tree_upto_level(Tree_level);
 	t1 = clock()-t1;
 	cout<<"tree generation time:"<<((float)t1)/CLOCKS_PER_SEC<<endl;
-	dg.BFS();
-/*
-int R1 = dg.query_base(200,550,300,650);
+	// dg.BFS();
+
+int R1 = dg.query_base(x1,y1,z1,x2,y2,z2);
 cout<<"exact query result:"<<R1<<endl;
 int rep = 1;
-
+/*
 ////########################## 3. Exact queries #################################
 cout<<"################ Exact Query #####################"<<endl;
 cout<<"\n=================\nbaseline:\n";
@@ -823,20 +871,20 @@ for(int i = 0 ; i<11;i++)// increase the query size
 	//cout<<sumtime/rep<<endl;
 	cout<<"time:"<<t2<<endl<<"========\n";
 }
-
-
-
-////################### 4. Convert aggregate tree to Bitmap #####################
-cout<<"######### Aggregate-Tree Bitmap Generation #################"<<endl;
+*/
+////################### 3. Convert aggregate tree to array #####################
+cout<<"######### preparing Aggregate-Tree for Bitmap Generation #################"<<endl;
 	t3 = clock();
 	//dg.BFS();
 	boost::dynamic_bitset<> Bit_representator;
 	vector<int>* aggregates = dg.BFS_max_depth(Tree_level,Bit_representator);
 	cout<<"===============>"<<endl;
+////################### 4. Convert aggregate tree to Bitmap #####################
+cout<<"######### Aggregate-Tree Bitmap Generation #################"<<endl;
 ////######################## VVVVVVVV Here! VVVVVVVV ############################
 
-Query_interface query_handler(dg.get_array(),dg.get_count(),dg.get_DimX(),dg.get_DimY(),&(aggregates->at(0)),aggregates->size(), Bit_representator);//generate the bitmaps ready to query
-int result = query_handler.Query(200,550,300,650);
+Query_interface query_handler(dg.get_array(),dg.get_count(),dg.get_DimX(),dg.get_DimY(),dg.get_DimZ(),&(aggregates->at(0)),aggregates->size(), Bit_representator);//generate the bitmaps ready to query
+/*int result = query_handler.Query(x1,y1,z1,x2,y2,z2);
 cout<<"combined result:"<<result<<endl;
 query_handler.print_access_log();
 float error = abs(R1-result)/float(R1);

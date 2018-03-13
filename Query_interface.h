@@ -8,7 +8,8 @@ class Query_interface {
 		Bitmap<int>* bitmap;	
 		int DimX = 0;
 		int DimY = 0;	
-		Bitmap<int>* bitmapTree;
+		int DimZ = 0;	
+		Bitmap<int>* bitmapTree;//this should be size_t
 		mybitops Bitops;////adds bit operations toolbox
 		///###################### ACTUAL BITMAP ####################
 		/*
@@ -45,7 +46,7 @@ class Query_interface {
 		int tree_access = 0;
 		int bitmap_access = 0;
 	public:
-		Query_interface(int* array,unsigned long items, int DX,int DY,int* aggregates, unsigned long aggregate_items, boost::dynamic_bitset<> BR);
+		Query_interface(int* array,unsigned long items, int DX,int DY, int DZ,int* aggregates, unsigned long aggregate_items, boost::dynamic_bitset<> BR);
 		~Query_interface();
 		int  Query(int x1, int y1, int x2, int y2);
 		void print_access_log();
