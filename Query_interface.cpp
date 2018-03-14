@@ -42,9 +42,7 @@ int Query_interface:: Query(pair<point,point> query_region){
 }
 
 int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, pair<point, point> node_region){
-	// cout<<"tree\n";
-	total_acccess++;
-	tree_access++;
+
 	// cout<<"tree query\n";
 	int X1 = node_region.first.x;
 	int Y1 = node_region.first.y;
@@ -69,6 +67,9 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 		pair<int,int>* node_min_max = bitmapTree->get_value(node_number);// get the bin statistic e.g. : [min:2,max: 10]
 		//gtt += clock()-tq;					
 		int node_value =  (node_min_max->first+node_min_max->second)/2;// assumption: represent the bin with the mid value of the bin range e.g. (2+10)/2=6
+		// cout<<"tree\n";	
+		total_acccess++;
+		tree_access++;
 		return node_value;
 	}	
 	/*calculate the node number of the possible children*/
@@ -243,7 +244,7 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 		//third_child_region->second.first<<","<<third_child_region->second.second<<endl;
 	if(a3!=NULL)
 	{
-		if(seventh_child>0) // if the third_child exists
+		if(third_child>0) // if the third_child exists
 		{		
 			r3 = TreeQuery(*a3, third_child,third_child_region);
 		}
@@ -482,7 +483,7 @@ float Query_interface::BitmapQuery(vector<pair<int, int>> Pv, vector<pair<int, i
 	//============== dimension based filtering ; lines 9-15 in 2015 paper algo.
 	
 	//cout<<"here3"<<Pdx[0].first<<","<<Pdx[0].second<<Pdy[0].first<<","<<Pdy[0].second<<endl;
-	vector<size_t> transalted_pd = translate(Pdx, Pdy);
+	vector<size_t> transalted_pd = translate(Pdx, Pdy,Pdz);
 	//for(auto w:transalted_pd)
 		//cout<<w;
 	//cout<<endl;
@@ -536,7 +537,7 @@ bool Query_interface::rangeOverlap(pair<int, int> b, vector<pair<int,int>> Pv)
 }
 
 /*translates the dimension based query into a bitvector predicate*/
-vector<size_t> Query_interface::translate (vector<pair<int, int>> Pdx,vector<pair<int, int>> Pdy)
+vector<size_t> Query_interface::translate (vector<pair<int, int>> Pdx,vector<pair<int, int>> Pdy,vector<pair<int, int>> Pdz)
 {
 	//cout<<"here2"<<endl;
 	boost::dynamic_bitset<> pd(bitmap->get_count());// make an output bitvector of the size of the input data
@@ -549,16 +550,17 @@ vector<size_t> Query_interface::translate (vector<pair<int, int>> Pdx,vector<pai
 		{
 			int y1 = y_pair.first;
 			int y2 = y_pair.second;
-			//cout<<"here"<<x1<<","<<y1<<","<<x2<<","<<y2<<endl;
-			for(int i = x1;i<=x2;i++)// sweep the x-axis
+			for(auto z_pair:Pdz)// for each partial range of z-dimension in the query
 			{
-				for(int j= y1;j<=y2;j++)// sweep the y-axis
-				{
-					//cout<<"i:"<<i<<" j:"<<j<<endl;
-					pd[i*DimY+j]=1;
-				}
+				int z1 = z_pair.first;
+				int z2 = z_pair.second;
+				for(int i = x1;i<=x2;i++)// sweep the x-axis
+					for(int j= y1;j<=y2;j++)// sweep the y-axis
+						for(int k= z1;k<=z2;k++)// sweep the z-axis
+							pd[i*DimY*DimZ+j*DimZ+k]=1;
 				
 			}
+			
 		}
 	}
 	//cout<<pd<<endl;

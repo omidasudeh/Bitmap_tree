@@ -214,7 +214,6 @@ class DataGenerator
 				}
 				aggregate_matrix.push_back(plain);
 			}
-			assert(false);
 			root = sum_helper(0,0,0,granularity-1,granularity-1,granularity-1,aggregate_matrix);
 		}
 
@@ -730,7 +729,6 @@ class DataGenerator
 					for(int k = z1;k<=z2;k++)
 						sum+=matrix[i][j][k];
 			return sum;
-
 		}
 
 };
@@ -815,11 +813,13 @@ clock_t t1,t2=0,t3=0,t4=0,sumtime=0,sumtime1=0,sumtime2=0;
 cout<<"############### Tree Generation #################"<<endl;
 	t1 = clock();
 	dg.generate_sum_tree_upto_level(Tree_level);
+
 	t1 = clock()-t1;
 	cout<<"tree generation time:"<<((float)t1)/CLOCKS_PER_SEC<<endl;
 	// dg.BFS();
+	// cout<<x1<<","<<y1<<","<<z1<<","<<x2<<","<<y2<<","<<z2<<endl;
+int R1 = dg.query_base(query_region.first.x,query_region.first.y,query_region.first.z,query_region.second.x,query_region.second.y,query_region.second.z);
 
-int R1 = dg.query_base(x1,y1,z1,x2,y2,z2);
 cout<<"\n#################################################"<<endl;	
 cout<<"exact query result:"<<R1<<endl;
 int rep = 1;
@@ -875,6 +875,7 @@ for(int i = 0 ; i<11;i++)// increase the query size
 	cout<<"time:"<<t2<<endl<<"========\n";
 }
 */
+
 ////################### 3. Convert aggregate tree to array #####################
 cout<<"\n#################################################"<<endl;	
 cout<<"preparing Aggregate-Tree for Bitmap Generation"<<endl;
@@ -890,14 +891,14 @@ cout<<"Aggregate-Tree Bitmap Generation"<<endl;
 Query_interface query_handler(dg.get_array(),dg.get_count(),dg.get_DimX(),dg.get_DimY(),dg.get_DimZ(),
 								&(aggregates->at(0)),aggregates->size(), Bit_representator);//generate the bitmaps ready to query
 
-/*
+
 int result = query_handler.Query(query_region);
 cout<<"combined result:"<<result<<endl;
 
 query_handler.print_access_log();
 float error = abs(R1-result)/float(R1);
 cout<<"accuracy: "<<1-error<<endl;
-
+/*
 
 cout<<"################ Approximate Query ###############"<<endl;
 for(int i = 0 ; i<11;i++)// increase the query size

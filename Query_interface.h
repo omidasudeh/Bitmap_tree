@@ -35,7 +35,7 @@ class Query_interface {
 		bool rangeOverlap(pair<int, int> b, vector<pair<int,int>> Pv);
 		
 		/*translates the dimension based query into a bitvector predicate*/
-		vector<size_t> translate (vector<pair<int, int>> Pdx,vector<pair<int, int>> Pdy);
+		vector<size_t> translate (vector<pair<int, int>> Pdx,vector<pair<int, int>> Pdy,vector<pair<int, int>> Pdz);
 		
 		/*returns the approximate summation of the query*/
 		float approximate_sum(unordered_map<int,int> * count_array);
