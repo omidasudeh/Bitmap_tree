@@ -54,6 +54,13 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 	int Y2 = node_region.second.y;
 	int Z2 = node_region.second.z;
 	
+	int x1 = query_region.first.x;
+	int y1 = query_region.first.y;
+	int z1 = query_region.first.z;
+
+	int x2 = query_region.second.x;
+	int y2 = query_region.second.y;
+	int z2 = query_region.second.z;
 	
 	//// if(match(query,region))
 	if(query_region == node_region) // base case: if the query region match the node area
@@ -167,8 +174,16 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 	int r6 = 0;
 	int r7 = 0;
 	int r8 = 0;
-	///// sub regions. set them null as default
-	pair<point,point> a1,a2,a3,a4,a5,a6,a7,a8;
+	///// subquery regions. set them null initially
+	pair<point,point>* a1 = NULL;
+	pair<point,point>* a2 = NULL;
+	pair<point,point>* a3 = NULL;
+	pair<point,point>* a4 = NULL;
+	pair<point,point>* a5 = NULL;
+	pair<point,point>* a6 = NULL;
+	pair<point,point>* a7 = NULL;
+	pair<point,point>* a8 = NULL;
+	
 	
 	//// calculate the subqury regions for the children
 	//cout<<"first_child:" <<first_child<<endl;
@@ -180,7 +195,7 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 	{
 		if(first_child>0) // if the first_child exists
 		{
-			r1 = TreeQuery(a1, first_child,first_child_region);
+			r1 = TreeQuery(*a1, first_child,first_child_region);
 		}
 		else
 		{
@@ -190,8 +205,10 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 			Pdx.push_back(pair<int, int>(x1 ,x2)); 
 			vector<pair<int, int>> Pdy; 
 			Pdy.push_back(pair<int, int>(y1,y2)); 
+			vector<pair<int, int>> Pdz; 
+			Pdz.push_back(pair<int, int>(z1,z2)); 
 			// cout<<"bitmap query:"<<a1->first.first<<","<<a1->first.second<<","<<a1->second.first<<","<<a1->second.second<<","<<endl;
-			return  BitmapQuery(Pv,Pdx,Pdy);
+			return  BitmapQuery(Pv,Pdx,Pdy,Pdz);
 			
 		}
 	}
@@ -203,7 +220,7 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 	{
 		if(second_child>0) // if the second_child exists
 		{
-			r2 = TreeQuery(a2, second_child,second_child_region);
+			r2 = TreeQuery(*a2, second_child,second_child_region);
 		}
 		else
 		{
@@ -213,8 +230,10 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 			Pdx.push_back(pair<int, int>(x1 ,x2)); 
 			vector<pair<int, int>> Pdy; 
 			Pdy.push_back(pair<int, int>(y1,y2)); 
+			vector<pair<int, int>> Pdz; 
+			Pdz.push_back(pair<int, int>(z1,z2)); 
 			// cout<<"bitmap query:"<<a1->first.first<<","<<a1->first.second<<","<<a1->second.first<<","<<a1->second.second<<","<<endl;
-			return  BitmapQuery(Pv,Pdx,Pdy);
+			return  BitmapQuery(Pv,Pdx,Pdy,Pdz);
 			
 		}
 	}
@@ -224,9 +243,9 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 		//third_child_region->second.first<<","<<third_child_region->second.second<<endl;
 	if(a3!=NULL)
 	{
-		if(third_child>0) // if the third_child exists
+		if(seventh_child>0) // if the third_child exists
 		{		
-			r3 = TreeQuery(a3, third_child,third_child_region);
+			r3 = TreeQuery(*a3, third_child,third_child_region);
 		}
 		else
 		{
@@ -236,8 +255,10 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 			Pdx.push_back(pair<int, int>(x1 ,x2)); 
 			vector<pair<int, int>> Pdy; 
 			Pdy.push_back(pair<int, int>(y1,y2)); 
+			vector<pair<int, int>> Pdz; 
+			Pdz.push_back(pair<int, int>(z1,z2)); 
 			// cout<<"bitmap query:"<<a1->first.first<<","<<a1->first.second<<","<<a1->second.first<<","<<a1->second.second<<","<<endl;
-			return  BitmapQuery(Pv,Pdx,Pdy);
+			return  BitmapQuery(Pv,Pdx,Pdy,Pdz);
 		}
 	}
 	a4 = TreeOverlap(query_region, forth_child_region);
@@ -247,7 +268,7 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 	{
 		if(forth_child>0) // if the fourth_child exists
 		{	
-			r4 = TreeQuery(a4, forth_child,forth_child_region);
+			r4= TreeQuery(*a4, forth_child,forth_child_region);
 		}
 		else
 		{
@@ -257,8 +278,104 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 			Pdx.push_back(pair<int, int>(x1 ,x2)); 
 			vector<pair<int, int>> Pdy; 
 			Pdy.push_back(pair<int, int>(y1,y2)); 
+			vector<pair<int, int>> Pdz; 
+			Pdz.push_back(pair<int, int>(z1,z2)); 
 			// cout<<"bitmap query:"<<a1->first.first<<","<<a1->first.second<<","<<a1->second.first<<","<<a1->second.second<<","<<endl;
-			return  BitmapQuery(Pv,Pdx,Pdy);
+			return  BitmapQuery(Pv,Pdx,Pdy,Pdz);
+		}	
+	}
+	a5 = TreeOverlap(query_region, fifth_child_region);
+	//cout<<x1<<","<< y1<<","<< x2<<"," <<y2<<","<<forth_child_region->first.first<<","<<forth_child_region->first.second<<","<<
+		//forth_child_region->second.first<<","<<forth_child_region->second.second<<endl;
+	if(a5!=NULL)
+	{
+		if(fifth_child>0) // if the fourth_child exists
+		{	
+			r5= TreeQuery(*a5, fifth_child,fifth_child_region);
+		}
+		else
+		{
+			vector<pair<int, int>> Pv; 
+			Pv.push_back(pair<int, int>(-100000,100000)); // skip the value_based filtering
+			vector<pair<int, int>> Pdx; 
+			Pdx.push_back(pair<int, int>(x1 ,x2)); 
+			vector<pair<int, int>> Pdy; 
+			Pdy.push_back(pair<int, int>(y1,y2)); 
+			vector<pair<int, int>> Pdz; 
+			Pdz.push_back(pair<int, int>(z1,z2)); 
+			// cout<<"bitmap query:"<<a1->first.first<<","<<a1->first.second<<","<<a1->second.first<<","<<a1->second.second<<","<<endl;
+			return  BitmapQuery(Pv,Pdx,Pdy,Pdz);
+		}	
+	}
+	a6 = TreeOverlap(query_region, sixth_child_region);
+	//cout<<x1<<","<< y1<<","<< x2<<"," <<y2<<","<<second_child_region->first.first<<","<<second_child_region->first.second<<","<<
+		//second_child_region->second.first<<","<<second_child_region->second.second<<endl;
+	if(a6!=NULL)
+	{
+		if(sixth_child>0) // if the second_child exists
+		{
+			r6 = TreeQuery(*a6, sixth_child,sixth_child_region);
+		}
+		else
+		{
+			vector<pair<int, int>> Pv; 
+			Pv.push_back(pair<int, int>(-100000,100000)); // skip the value_based filtering
+			vector<pair<int, int>> Pdx; 
+			Pdx.push_back(pair<int, int>(x1 ,x2)); 
+			vector<pair<int, int>> Pdy; 
+			Pdy.push_back(pair<int, int>(y1,y2)); 
+			vector<pair<int, int>> Pdz; 
+			Pdz.push_back(pair<int, int>(z1,z2)); 
+			// cout<<"bitmap query:"<<a1->first.first<<","<<a1->first.second<<","<<a1->second.first<<","<<a1->second.second<<","<<endl;
+			return  BitmapQuery(Pv,Pdx,Pdy,Pdz);
+			
+		}
+	}
+	
+	a7 = TreeOverlap(query_region, seventh_child_region);
+	//cout<<x1<<","<< y1<<","<< x2<<"," <<y2<<","<<third_child_region->first.first<<","<<third_child_region->first.second<<","<<
+		//third_child_region->second.first<<","<<third_child_region->second.second<<endl;
+	if(a7!=NULL)
+	{
+		if(seventh_child>0) // if the third_child exists
+		{		
+			r7 = TreeQuery(*a7, seventh_child,seventh_child_region);
+		}
+		else
+		{
+			vector<pair<int, int>> Pv; 
+			Pv.push_back(pair<int, int>(-100000,100000)); // skip the value_based filtering
+			vector<pair<int, int>> Pdx; 
+			Pdx.push_back(pair<int, int>(x1 ,x2)); 
+			vector<pair<int, int>> Pdy; 
+			Pdy.push_back(pair<int, int>(y1,y2)); 
+			vector<pair<int, int>> Pdz; 
+			Pdz.push_back(pair<int, int>(z1,z2)); 
+			// cout<<"bitmap query:"<<a1->first.first<<","<<a1->first.second<<","<<a1->second.first<<","<<a1->second.second<<","<<endl;
+			return  BitmapQuery(Pv,Pdx,Pdy,Pdz);
+		}
+	}
+	a8 = TreeOverlap(query_region, eighth_child_region);
+	//cout<<x1<<","<< y1<<","<< x2<<"," <<y2<<","<<forth_child_region->first.first<<","<<forth_child_region->first.second<<","<<
+		//forth_child_region->second.first<<","<<forth_child_region->second.second<<endl;
+	if(a8!=NULL)
+	{
+		if(eighth_child>0) // if the fourth_child exists
+		{	
+			r8 = TreeQuery(*a8, eighth_child,eighth_child_region);
+		}
+		else
+		{
+			vector<pair<int, int>> Pv; 
+			Pv.push_back(pair<int, int>(-100000,100000)); // skip the value_based filtering
+			vector<pair<int, int>> Pdx; 
+			Pdx.push_back(pair<int, int>(x1 ,x2)); 
+			vector<pair<int, int>> Pdy; 
+			Pdy.push_back(pair<int, int>(y1,y2)); 
+			vector<pair<int, int>> Pdz; 
+			Pdz.push_back(pair<int, int>(z1,z2)); 
+			// cout<<"bitmap query:"<<a1->first.first<<","<<a1->first.second<<","<<a1->second.first<<","<<a1->second.second<<","<<endl;
+			return  BitmapQuery(Pv,Pdx,Pdy,Pdz);
 		}	
 	}
 	//cout<<r1<<" "<<r2<<" "<<r3<<" "<<r4<<" "<<r1+r2+r3+r4<<endl;
@@ -297,37 +414,55 @@ int Query_interface::bitmap_tree_index(int node_number){
 
 	return  index;
 }
-pair<point, point> Query_interface::TreeOverlap(pair<point, point> query_region,pair<point, point> node_region)
-{
+pair<point, point>* Query_interface::TreeOverlap(pair<point, point> query_region,pair<point, point> node_region)
+{	
 	//// calculate the subqury regions for the children
 
-	pair<pair<int,int>, pair<int,int>>* result = NULL; //programming problem local object is being returned!
-	pair<int,int> top_left;
-	pair<int,int> bottom_right;
+	pair<point, point>* result = NULL; 
+	point top_left;
+	point bottom_right;
 	//cout<<"overlap get region---| "<<endl;
 	//cout<<"---------------------|\n"<<endl;
-	int X1 = node_region->first.first;
-	int Y1 = node_region->first.second;
-	int X2 = node_region->second.first;
-	int Y2 = node_region->second.second;
+	int X1 = node_region.first.x;
+	int Y1 = node_region.first.y;
+	int Z1 = node_region.first.z;
+	
+	int X2 = node_region.second.x;
+	int Y2 = node_region.second.y;
+	int Z2 = node_region.second.z;
+
+	int x1 = query_region.first.x;
+	int y1 = query_region.first.y;
+	int z1 = query_region.first.z;
+
+	int x2 = query_region.second.x;
+	int y2 = query_region.second.y;
+	int z2 = query_region.second.z;
+	
 	//cout<<"overlap("<<x1<<","<<y1<<" "<<x2<<","<<y2<<") over ("<<X1<<","<<Y1<<" "<<X2<<","<<Y2<<")"<<endl;
-	top_left.first = (x1>X1)?x1:X1;//max(x1,X1)
-	top_left.second = (y1>Y1)?y1:Y1;//max(y1,Y1)
-	bottom_right.first = (x2<=X2)?x2:X2;//min(x2,X2)
-	bottom_right.second = (y2<=Y2)?y2:Y2;//min(y2,Y2)
-	if(bottom_right.first<top_left.first || bottom_right.second<top_left.second ) // no overlap between query region and node area
+	top_left.x = (x1>X1)?x1:X1;//max(x1,X1)
+	top_left.y = (y1>Y1)?y1:Y1;//max(y1,Y1)
+	top_left.z = (z1>Z1)?z1:Z1;//max(z1,Z1)
+	bottom_right.x = (x2<=X2)?x2:X2;//min(x2,X2)
+	bottom_right.y = (y2<=Y2)?y2:Y2;//min(y2,Y2)
+	bottom_right.z = (z2<=Z2)?z2:Z2;//min(z2,Z2)
+	if(bottom_right.x<top_left.x || bottom_right.y<top_left.y ||  bottom_right.z<top_left.z ) // no overlap between query region and node area
 	{
 		return NULL;
 	}
-	result = new pair<pair<int,int>, pair<int,int>>;
-	result->first.first = top_left.first;
-	result->first.second = top_left.second;
-	result->second.first = bottom_right.first;
-	result->second.second = bottom_right.second;
+	result = new pair<point,point>;
+	result->first.x = top_left.x;
+	result->first.y = top_left.y;
+	result->first.z = top_left.z;
+	
+	result->second.x = bottom_right.x;
+	result->second.y = bottom_right.y;
+	result->second.z  = bottom_right.z;
+	
 	return result;
 	
 }
-float Query_interface::BitmapQuery(vector<pair<int, int>> Pv, vector<pair<int, int>> Pdx,vector<pair<int, int>> Pdy)
+float Query_interface::BitmapQuery(vector<pair<int, int>> Pv, vector<pair<int, int>> Pdx,vector<pair<int, int>> Pdy, vector<pair<int, int>> Pdz)
 {
 	// cout<<"bitmap\n";
 	total_acccess++;
