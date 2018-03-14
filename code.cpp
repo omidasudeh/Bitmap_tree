@@ -214,6 +214,7 @@ class DataGenerator
 				}
 				aggregate_matrix.push_back(plain);
 			}
+			assert(false);
 			root = sum_helper(0,0,0,granularity-1,granularity-1,granularity-1,aggregate_matrix);
 		}
 
