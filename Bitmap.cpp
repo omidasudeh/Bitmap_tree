@@ -505,3 +505,4 @@ template class Bitmap<double>;
 template class Bitmap<float>;
 template class Bitmap<int>;
 template class Bitmap<long>;
+template class Bitmap<size_t>;

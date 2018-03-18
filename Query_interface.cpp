@@ -1,18 +1,22 @@
 #include "Query_interface.h"
-Query_interface::Query_interface(int* array,unsigned long items, int DX,int DY, int DZ,int* aggregates, unsigned long aggregate_items, boost::dynamic_bitset<> BR){
+Query_interface::Query_interface(size_t* array,unsigned long items, int DX,int DY, int DZ,size_t* aggregates, unsigned long aggregate_items, boost::dynamic_bitset<> BR){
+		
+		cout<<"Creating bitmap tree ...\n";
+		cout<<hex<<"items:"<<aggregate_items<<endl;		
+		bitmapTree = new Bitmap<size_t>(aggregates,aggregate_items);
+		bitmapTree->calcPreAgg();
+		//bitmapTree->print_stat();
+		this->Bit_representator = BR;
+		//this->compressed_Bit_representator = compressBitset(BR);
+
 		cout<<"Creating Actual bitmap ...\n";
-		bitmap = new Bitmap<int>(array,items);		
+		cout<<"items:"<<items<<endl;
+		bitmap = new Bitmap<size_t>(array,items);		
 		bitmap->calcPreAgg();
 		//bitmap->print_stat();
 		DimX = DX;
 		DimY = DY;
 		DimZ = DZ;
-		cout<<"Creating bitmap tree ...\n";
-		bitmapTree = new Bitmap<int>(aggregates,aggregate_items);
-		bitmapTree->calcPreAgg();
-		//bitmapTree->print_stat();
-		this->Bit_representator = BR;
-		//this->compressed_Bit_representator = compressBitset(BR);
 	}
 Query_interface::~Query_interface(){
 	delete bitmapTree;

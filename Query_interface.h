@@ -14,11 +14,11 @@ struct point
 };
 class Query_interface {
 	private:
-		Bitmap<int>* bitmap;	
+		Bitmap<size_t>* bitmap;	
 		int DimX = 0;
 		int DimY = 0;	
 		int DimZ = 0;	
-		Bitmap<int>* bitmapTree;//this should be size_t
+		Bitmap<size_t>* bitmapTree;//this should be size_t
 		mybitops Bitops;////adds bit operations toolbox
 		///###################### ACTUAL BITMAP ####################
 		/*
@@ -55,7 +55,7 @@ class Query_interface {
 		int tree_access = 0;
 		int bitmap_access = 0;
 	public:
-		Query_interface(int* array,unsigned long items, int DX,int DY, int DZ,int* aggregates, unsigned long aggregate_items, boost::dynamic_bitset<> BR);
+		Query_interface(size_t* array,unsigned long items, int DX,int DY, int DZ,size_t* aggregates, unsigned long aggregate_items, boost::dynamic_bitset<> BR);
 		~Query_interface();
 		int  Query(pair<point,point> query_region);
 		void print_access_log();

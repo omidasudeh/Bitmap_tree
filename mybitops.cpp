@@ -6,6 +6,7 @@
 using namespace std;
 ////###################### Bit Operation ###################################
 
+
  vector<size_t> mybitops::logic_and(vector<size_t> vector1, vector<size_t> vector2) {
   int ones = 0, zeros = 0;
   vector<size_t> result_vector;
