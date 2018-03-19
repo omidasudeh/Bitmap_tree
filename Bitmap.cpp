@@ -634,6 +634,7 @@ void Bitmap<a_type>:: print_stat()
 template <class a_type>
 void Bitmap<a_type>::save_bitmap(string dir)
 {
+	save_variables(dir+"variables");
 	save_secondlevelvectors(dir+"secondlevelvectors");
 	save_firstlevelvectors(dir+"firstlevelvectors");
 
@@ -644,6 +645,16 @@ void Bitmap<a_type>::save_bitmap(string dir)
 	
 	// save_second_level_sums(dir);
 	// save_first_level_sums(dir);
+}
+template <class a_type>
+void Bitmap<a_type>::save_variables(string dir)
+{
+	////file structure:
+	////first line: numpress minvalue maxvalue itemCounts
+	ofstream myfile;
+	myfile.open (dir);
+	myfile<<numpres<<" "<<minvalue<<" "<<maxvalue<<" "<<itemsCount<<endl;
+	myfile.close();
 }
 
 template <class a_type>
@@ -715,7 +726,7 @@ void Bitmap<a_type>::save_second_level_statistics(string dir)
 	myfile<<second_level_statistics.size()<<endl;          ////first line: number of bins
 	for(auto bin_stat :second_level_statistics)
 	{
-		myfile<<bin_stat.sum<<" "<<bin_stat.count<<""<<bin_stat.min<<" "<<bin_stat.max<<endl;
+		myfile<<bin_stat.sum<<" "<<bin_stat.count<<" "<<bin_stat.min<<" "<<bin_stat.max<<endl;
 	}
 	myfile.close();
 }
@@ -730,7 +741,7 @@ void Bitmap<a_type>::save_first_level_statistics(string dir)
 	myfile<<first_level_statistics.size()<<endl;          ////first line: number of bins	
 	for(auto bin_stat :first_level_statistics)
 	{
-		myfile<<bin_stat.sum<<" "<<bin_stat.count<<""<<bin_stat.min<<" "<<bin_stat.max<<endl;
+		myfile<<bin_stat.sum<<" "<<bin_stat.count<<" "<<bin_stat.min<<" "<<bin_stat.max<<endl;
 	}
 	myfile.close();
 }
@@ -738,6 +749,7 @@ void Bitmap<a_type>::save_first_level_statistics(string dir)
 template <class a_type>
 void Bitmap<a_type>:: load_bitmap(string dir)
 {
+	load_variables(dir+"variables");
 	load_secondlevelvectors(dir+"secondlevelvectors");
 	load_firstlevelvectors(dir+"firstlevelvectors");
 
@@ -749,6 +761,17 @@ void Bitmap<a_type>:: load_bitmap(string dir)
 // 	load_second_level_sums(dir);
 // 	load_first_level_sums(dir);
 } 
+template <class a_type>
+void Bitmap<a_type>::load_variables(string dir)
+{
+	////file structure:
+	////first line: numpress minvalue maxvalue itemCounts
+	ifstream myfile;
+	myfile.open (dir);
+	myfile>>numpres>>minvalue>>maxvalue>>itemsCount;
+	myfile.close();
+}
+
 template <class a_type>
 void Bitmap<a_type>::load_secondlevelvectors(string dir)
 {
