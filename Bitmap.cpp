@@ -1,6 +1,7 @@
 #include "Bitmap.h"
 #include <vector>
 #include <cmath>
+#include <fstream>
 
 using namespace std;
 #define DebugMode false// generate more text
@@ -629,38 +630,234 @@ void Bitmap<a_type>:: print_stat()
 		i++;
 	}
 }
-
+//// ########################################## save/load fucntions ##########################################
 template <class a_type>
-void save_bitmap(string dir)
+void Bitmap<a_type>::save_bitmap(string dir)
 {
-	// save_secondlevelvectors(dir);
-	// save_firstlevelvectors(dir);
+	save_secondlevelvectors(dir+"secondlevelvectors");
+	save_firstlevelvectors(dir+"firstlevelvectors");
 
-	// save_firstlevelvalue(dir);
+	save_firstlevelvalue(dir+"firstlevelvalue");
 
-	// save_second_level_statistics(dir);
-	// save_first_level_statistics(dir);
+	save_second_level_statistics(dir+"second_level_statistics");
+	save_first_level_statistics(dir+"first_level_statistics");
 	
 	// save_second_level_sums(dir);
 	// save_first_level_sums(dir);
 }
-// template <class a_type>
-// void load_bitmap(string dir)
-// {
-// 	load_secondlevelvectors(dir);
-// 	load_firstlevelvectors(dir);
 
-// 	load_firstlevelvalue(dir);
+template <class a_type>
+void Bitmap<a_type>::save_secondlevelvectors(string dir)
+{
+	////file structure:
+	////first line: number of bins
+	////other lines: start with number or words in the bin, followed by other words
 
-// 	load_second_level_statistics(dir);
-// 	load_first_level_statistics(dir);
+	ofstream myfile;
+	myfile.open (dir);
+	myfile<<secondlevelvectors->size()<<endl;          ////first line: number of bins
+	for(auto bin :(*secondlevelvectors))
+	{
+		myfile<<bin.size()<<" ";
+		for(size_t word : bin)
+		{
+			myfile<<word<<" ";
+		}
+		myfile<<endl;
+	}
+	myfile.close();
+}
+template <class a_type>
+void Bitmap<a_type>::save_firstlevelvectors(string dir)
+{
+	////file structure:
+	////first line: number of bins
+	////other lines: start with number or words in the bin, followed by other words
+
+	ofstream myfile;
+	myfile.open (dir);
+	myfile<<firstlevelvectors->size()<<endl;          ////first line: number of bins
+	for(auto bin :(*firstlevelvectors))
+	{
+		myfile<<bin.size()<<" ";
+		for(size_t word : bin)
+		{
+			myfile<<word<<" ";
+		}
+		myfile<<endl;
+	}
+	myfile.close();
+}
+template <class a_type>
+void Bitmap<a_type>::save_firstlevelvalue(string dir)
+{
+	////file structure:
+	////first line: number of lines
+	////other lines: min max
+	ofstream myfile;
+	myfile.open (dir);
+	myfile<<firstlevelvalue->size()<<endl;
+	for(auto bin_boundary :(*firstlevelvalue))
+	{
+		myfile<<bin_boundary.min_val<<" "<<bin_boundary.max_val<<endl;
+	}
+	myfile.close();
+}
+
+template <class a_type>
+void Bitmap<a_type>::save_second_level_statistics(string dir)
+{
+	////file structure:
+	////first line: number of lines
+	////other lines: sum count min max
+	ofstream myfile;
+	myfile.open (dir);
+	myfile<<second_level_statistics.size()<<endl;          ////first line: number of bins
+	for(auto bin_stat :second_level_statistics)
+	{
+		myfile<<bin_stat.sum<<" "<<bin_stat.count<<""<<bin_stat.min<<" "<<bin_stat.max<<endl;
+	}
+	myfile.close();
+}
+template <class a_type>
+void Bitmap<a_type>::save_first_level_statistics(string dir)
+{
+	////file structure:
+	////first line: number of lines
+	////other lines: sum count min max
+	ofstream myfile;
+	myfile.open (dir);
+	myfile<<first_level_statistics.size()<<endl;          ////first line: number of bins	
+	for(auto bin_stat :first_level_statistics)
+	{
+		myfile<<bin_stat.sum<<" "<<bin_stat.count<<""<<bin_stat.min<<" "<<bin_stat.max<<endl;
+	}
+	myfile.close();
+}
+
+template <class a_type>
+void Bitmap<a_type>:: load_bitmap(string dir)
+{
+	load_secondlevelvectors(dir+"secondlevelvectors");
+	load_firstlevelvectors(dir+"firstlevelvectors");
+
+	load_firstlevelvalue(dir+"firstlevelvalue");
+
+	load_second_level_statistics(dir+"second_level_statistics");
+	load_first_level_statistics(dir+"first_level_statistics");
 	
 // 	load_second_level_sums(dir);
 // 	load_first_level_sums(dir);
-// } 
+} 
+template <class a_type>
+void Bitmap<a_type>::load_secondlevelvectors(string dir)
+{
+	////file structure:
+	////first line: number of bins
+	////other lines: start with number or words in the bin, followed by other words
 
+	ifstream myfile;
+	myfile.open (dir);
+	int number_of_bins = 0;
+	myfile>>number_of_bins;          ////first line: number of bins
+	secondlevelvectors = new vector<vector<size_t>>;
+	for(int i = 0;i<number_of_bins;i++)
+	{
+		int number_of_words = 0;
+		vector<size_t> bin;
+		myfile>>number_of_words;
+		for(int j = 0;j< number_of_words;j++)
+		{
+			int word = 0;
+			myfile>>word;
+			bin.push_back(word);
+		}
+		secondlevelvectors->push_back(bin);
+	}
+	myfile.close();
+}
+template <class a_type>
+void Bitmap<a_type>::load_firstlevelvectors(string dir)
+{
+	////file structure:
+	////first line: number of bins
+	////other lines: start with number or words in the bin, followed by other words
 
-
+	ifstream myfile;
+	myfile.open (dir);
+	int number_of_bins = 0;
+	myfile>>number_of_bins;          ////first line: number of bins
+	firstlevelvectors = new vector<vector<size_t>>;
+	for(int i = 0;i<number_of_bins;i++)
+	{
+		int number_of_words = 0;
+		vector<size_t> bin;
+		myfile>>number_of_words;
+		for(int j = 0;j< number_of_words;j++)
+		{
+			int word = 0;
+			myfile>>word;
+			bin.push_back(word);
+		}
+		firstlevelvectors->push_back(bin);
+	}
+	myfile.close();
+}
+template <class a_type>
+void Bitmap<a_type>::load_firstlevelvalue(string dir)
+{
+	////file structure:
+	////first line: number of lines
+	////other lines: min max
+	ifstream myfile;
+	myfile.open (dir);	
+	firstlevelvalue = new vector<struct index_bin>;
+	int number_of_bins = 0;
+	myfile>>number_of_bins;////first line: number of lines
+	for(int i = 0;i<number_of_bins;i++)
+	{
+		index_bin t;
+		myfile>>t.min_val>>t.max_val;
+		firstlevelvalue->push_back(t);
+	}
+	myfile.close();
+}
+template <class a_type>
+void Bitmap<a_type>::load_second_level_statistics(string dir)
+{
+	////file structure:
+	////first line: number of lines
+	////other lines: sum count min max
+	ifstream myfile;
+	myfile.open (dir);	
+	int number_of_bins = 0;
+	myfile>>number_of_bins;////first line: number of lines
+	for(int i = 0;i<number_of_bins;i++)
+	{
+		stat t;
+		myfile>>t.sum>>t.count>>t.min>>t.max;
+		second_level_statistics.push_back(t);
+	}
+	myfile.close();
+}
+template <class a_type>
+void Bitmap<a_type>::load_first_level_statistics(string dir)
+{
+	////file structure:
+	////first line: number of lines
+	////other lines: sum count min max
+	ifstream myfile;
+	myfile.open (dir);	
+	int number_of_bins = 0;
+	myfile>>number_of_bins;////first line: number of lines
+	for(int i = 0;i<number_of_bins;i++)
+	{
+		stat t;
+		myfile>>t.sum>>t.count>>t.min>>t.max;
+		first_level_statistics.push_back(t);
+	}
+	myfile.close();
+}
 
 template class Bitmap<double>;
 template class Bitmap<float>;

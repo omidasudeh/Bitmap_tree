@@ -67,20 +67,20 @@ private:
 	void setPrecision();
 ////############################# save/load functions ###################################
 void save_secondlevelvectors(string dir);
-// void save_firstlevelvectors(dir);
-// void save_firstlevelvalue(dir);
-// void save_second_level_statistics(dir);
-// void save_first_level_statistics(dir);
-// void save_second_level_sums(dir);
-// void save_first_level_sums(dir);
+void save_firstlevelvectors(string dir);
+void save_firstlevelvalue(string dir);
+void save_second_level_statistics(string dir);
+void save_first_level_statistics(string dir);
+void save_second_level_sums(string dir);
+void save_first_level_sums(string dir);
 	
-// void load_secondlevelvectors(dir);
-// void load_firstlevelvectors(dir);
-// void load_firstlevelvalue(dir);
-// void load_second_level_statistics(dir);
-// void load_first_level_statistics(dir);
-// void load_second_level_sums(dir);
-// void load_first_level_sums(dir);
+void load_secondlevelvectors(string dir);
+void load_firstlevelvectors(string dir);
+void load_firstlevelvalue(string dir);
+void load_second_level_statistics(string dir);
+void load_first_level_statistics(string dir);
+// void load_second_level_sums(string dir);
+// void load_first_level_sums(string dir);
 
 public:
 	
