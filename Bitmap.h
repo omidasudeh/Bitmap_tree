@@ -46,14 +46,14 @@ private:
 	vector<vector<size_t>>* secondlevelvectors;//low-level bins
 	
 	//================ pre-aggregation statistics
-	vector<stat> second_level_statistics;
-	vector<stat> first_level_statistics;
-	unordered_map<int,int>* second_level_sums;
-	unordered_map<int,int>* first_level_sums;
+	vector<stat> second_level_statistics; // stats of each second level bin
+	vector<stat> first_level_statistics;//stats of each first level bin
+	unordered_map<int,int>* second_level_sums; //sum of each second level bin
+	unordered_map<int,int>* first_level_sums;//sum of each first level bin
 	//=================chunked bitvectors ============
-	vector<vector<vector<size_t>>> * first_level_bitmap;// high-level bitmap
-	vector<vector<vector<size_t>>> * second_level_bitmap;// low-level bitmap
-	int chunk_size = 100;
+	// vector<vector<vector<size_t>>> * first_level_bitmap;// high-level bitmap
+	// vector<vector<vector<size_t>>> * second_level_bitmap;// low-level bitmap
+	// int chunk_size = 100;
 	//===================== accesss to bit operations ==================
 	mybitops Bitops;
 	
@@ -65,8 +65,23 @@ private:
 	 * In the future, we plan to provide an interface for users to specify the bin number
 	 */ 
 	void setPrecision();
+////############################# save/load functions ###################################
+void save_secondlevelvectors(string dir);
+// void save_firstlevelvectors(dir);
+// void save_firstlevelvalue(dir);
+// void save_second_level_statistics(dir);
+// void save_first_level_statistics(dir);
+// void save_second_level_sums(dir);
+// void save_first_level_sums(dir);
 	
-	
+// void load_secondlevelvectors(dir);
+// void load_firstlevelvectors(dir);
+// void load_firstlevelvalue(dir);
+// void load_second_level_statistics(dir);
+// void load_first_level_statistics(dir);
+// void load_second_level_sums(dir);
+// void load_first_level_sums(dir);
+
 public:
 	
 	Bitmap(a_type* array, unsigned long items);
@@ -89,7 +104,7 @@ public:
 	
 	/*
 	 * checks if an index exist in a bin*/
-	bool isInBin(int bin_number,int chunk_number, vector<size_t>& comp_chunk_index); 
+	// bool isInBin(int bin_number,int chunk_number, vector<size_t>& comp_chunk_index); 
 	
 	/*
 	 * Find the cardinality of high-level bitmap indices (or number of high-level bins)
@@ -124,6 +139,9 @@ public:
 	
 	/*prints the pre-aggregation statistics*/
 	void print_stat();
+	////########################## save/load file ###########################
+	void save_bitmap(string dir);
+	void load_bitmap(string dir); 
 
 
 };

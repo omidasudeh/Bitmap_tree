@@ -5,12 +5,13 @@
 using namespace std;
 #define DebugMode false// generate more text
 #define TRACE false // to debug the node number to child bitmap tree index
-#define SET_PREC true // set_precision()
+#define SET_PREC false // set_precision()
 /*
  * the constructor function
  */
 template <class a_type> 
 Bitmap<a_type>::Bitmap(a_type* array, unsigned long items){
+	clock_t t0 = clock();
 	itemsCount = 0;// initially set the number of the items to 0
 	firstlevelvalue = new vector<struct index_bin>();// a vector of the the min and max values of the first level bins
 	varvalmap = new map<int,int>();
@@ -19,12 +20,11 @@ Bitmap<a_type>::Bitmap(a_type* array, unsigned long items){
 	firstlevelvectors = new vector<vector<size_t>>();// high-level indices
 	secondlevelvectors = new vector<vector<size_t>>();//low-level indecies 
 	//####################### chunked bitmap ###########
-	second_level_bitmap = new vector<vector<vector<size_t>>>();
-	first_level_bitmap = new vector<vector<vector<size_t>>>();
+	// second_level_bitmap = new vector<vector<vector<size_t>>>();
+	// first_level_bitmap = new vector<vector<vector<size_t>>>();
 	//##################################################
-	//======================== define a bitops object ==================
-	//Bitops = new bitops();
-	
+	clock_t t1 = clock();
+	cout<< t1-t0<<endl;
 	//fetch the data block and initialize vector size
 	a_type * data_in = array;
 	//====== calculate the minimum and the maximum of the data (using a linear search)
@@ -40,6 +40,8 @@ Bitmap<a_type>::Bitmap(a_type* array, unsigned long items){
 		if(data_in[i] < minvalue)
 			minvalue = data_in[i];
 	}
+	clock_t t2 = clock();
+	cout<< t2-t1<<endl;
 	//set the current precision(total number of low-level bins) based on value ranges
 	setPrecision();
 	
@@ -62,7 +64,8 @@ Bitmap<a_type>::Bitmap(a_type* array, unsigned long items){
 		  bitvectors[varvalmap->find(temp)->second].push_back(i);
 		//}
 	}
-
+	clock_t t3 = clock();
+	cout<< t3-t2<<endl;
 	//============== calculate second_level_sums
 	for(auto elem: *varvalmap) {
 		int scaled_data = elem.first;
@@ -72,30 +75,31 @@ Bitmap<a_type>::Bitmap(a_type* array, unsigned long items){
 		second_level_sums->insert(pair<int, int>(bin_number,data*bitvector_size));
 	}
 //////////////////////Generate the second-level(low-level) bitvectors/////////////////////
-	
+	clock_t t4 = clock();
+	cout<< t4-t3<<endl;
 	for(int i=0; i<varvalmap->size(); i++) {
-		boost::dynamic_bitset<> tempvector(items);
+		boost::dynamic_bitset<> tempvector(items);//////////////
 		for(int j=0; j<bitvectors[i].size(); j++) {
 		  tempvector[bitvectors[i][j]] = 1;
 		}
-		
-		boost::dynamic_bitset<> chunk(chunk_size);
-		vector<vector<size_t>> compressed_bitvector;
-		for(int k = 0 ; k<items;k++)
-		{
-			//cout<<"chSz"<<chunk_size<<"items"<<items<<endl;
-			chunk[k%chunk_size] = tempvector[k];
-			if((k+1)%chunk_size == 0) // if the chunk is complete
-			{ // then compress it and add it to the compressed_bitvector
-				compressed_bitvector.push_back(Bitops.compressBitset(chunk));
-			}
-		}
+		cout<<"here compress"<<endl;
+		// boost::dynamic_bitset<> chunk(chunk_size);
+		// vector<vector<size_t>> compressed_bitvector;
+		// for(int k = 0 ; k<items;k++)
+		// {
+		// 	//cout<<"chSz"<<chunk_size<<"items"<<items<<endl;
+		// 	chunk[k%chunk_size] = tempvector[k];
+		// 	if((k+1)%chunk_size == 0) // if the chunk is complete
+		// 	{ // then compress it and add it to the compressed_bitvector
+		// 		compressed_bitvector.push_back(Bitops.compressBitset(chunk));
+		// 	}
+		// }
 		//cout<<compressed_bitvector.size()<<"tttttt\n";
-		second_level_bitmap->push_back(compressed_bitvector);
-		
-		
+		// second_level_bitmap->push_back(compressed_bitvector);		
 		secondlevelvectors->push_back(Bitops.compressBitset(tempvector));
 	}
+	clock_t t5 = clock();
+	cout<< t5-t4<<endl;
 	/*int i=0;
 	for(auto bitvector:(*second_level_bitmap))
 	{
@@ -121,7 +125,7 @@ Bitmap<a_type>::Bitmap(a_type* array, unsigned long items){
 		preit = curit++;
 		int sum = (*second_level_sums)[i];//===
 		//=========================
-		vector<vector<size_t>> first_level_temp = (*second_level_bitmap)[i];///// be carefule assignment!!! 
+		// vector<vector<size_t>> first_level_temp = (*second_level_bitmap)[i];///// be carefule assignment!!! 
 		//cout<<"first_level_temp.size "<<first_level_temp.size()<<endl;
 		//=========================
 		vector<size_t> firstlevelidx = (*secondlevelvectors)[i++];
@@ -131,11 +135,11 @@ Bitmap<a_type>::Bitmap(a_type* array, unsigned long items){
 		  firstlevelidx = Bitops.logic_or(firstlevelidx, (*secondlevelvectors)[i++]);
 		  preit = curit++;
 		  //==================
-		  for(int t = 0; t<first_level_temp.size();t++)
-		  {
-			  //cout<<first_level_temp[t].size()<<"  "<<(*second_level_bitmap)[i][t].size()<<endl;
-			  first_level_temp[t]= Bitops.logic_or(first_level_temp[t], (*second_level_bitmap)[i][t]);
-		  }
+		//   for(int t = 0; t<first_level_temp.size();t++)
+		//   {
+		// 	  //cout<<first_level_temp[t].size()<<"  "<<(*second_level_bitmap)[i][t].size()<<endl;
+		// 	  first_level_temp[t]= Bitops.logic_or(first_level_temp[t], (*second_level_bitmap)[i][t]);
+		//   }
 		  //==================
 		}
 		curbin.max_val = (*preit).first;
@@ -143,13 +147,15 @@ Bitmap<a_type>::Bitmap(a_type* array, unsigned long items){
 		
 		
 		//=======================
-		first_level_bitmap->push_back(first_level_temp);
+		// first_level_bitmap->push_back(first_level_temp);
 		//=======================
 		
 		firstlevelvectors->push_back(firstlevelidx);
 		first_level_sums->insert(pair<int, int>(k,sum));//===
 		k++;
 	}
+	clock_t t6 = clock();
+	cout<< t6-t5<<endl;
 	/*i=0;
 	for(auto bitvector:(*first_level_bitmap))
 	{
@@ -300,6 +306,127 @@ vector<struct index_bin>*Bitmap<a_type>:: get_firstlevelvalue()
 */
 template <class a_type>
 pair<int,int> * Bitmap<a_type>:: get_value(int node_number)
+{	
+	pair<int,int>* result = NULL; 
+	int number_of_bins = (*firstlevelvectors).size();
+	
+	
+	/* 	//////// naive get_node_value approach
+	 * fun to work with
+	 * well communicate
+	 * know your shet 
+	boost::dynamic_bitset<>bit_node_number(itemsCount);
+	bit_node_number.set(node_number);
+	for(int i = number_of_bins-1;i>=0;i--)
+	{
+		//cout<<i<<"   "<<(*firstlevelvalue)[i].min_val/numpres<<endl;
+		//cout<<node_number<<"  "<<bit_node_number<<endl<<uncompressIndex((*firstlevelvectors)[i], itemsCount)<<endl<<"-------------\n";
+		//assert(false);
+		if((bit_node_number&uncompressIndex((*firstlevelvectors)[i], itemsCount)).any())
+		{
+			result = new pair<int,int>;
+			result->first = (*firstlevelvalue)[i].min_val/numpres;
+			result->second= (*firstlevelvalue)[i].max_val/numpres;
+			return result;
+		}
+	}*/
+		
+	//////// fast get_node_value approach
+	
+	////naive bitset compression approach	
+	/*boost::dynamic_bitset<>bit_node_number(itemsCount);//TODO: it ideally should be the lenght of a compressed bin after compression. itemsCount or 1, node number +1?
+	bit_node_number.set(node_number);
+	vector<size_t>comp_node_number = compressBitset(bit_node_number);
+	*/
+
+	
+		
+	////fast setbit compression	
+	//clock_t tq = clock();
+	 vector<size_t> comp_node_number ;	 
+	 int HZero = node_number - node_number%31;
+	 if(HZero>0)
+	 {
+		size_t HZeroW = 0x80000000 + HZero;
+		comp_node_number.push_back(HZeroW);
+	 }
+	 int OneW=0;
+	 if(itemsCount<31)
+	 	 OneW = 1<<itemsCount-(node_number-HZero)-1;
+	 else
+	 	 OneW = 1<<31-(node_number-HZero)-1;
+	 comp_node_number.push_back(OneW);
+	 
+	 int LZero = itemsCount-HZero-31;
+	 if(LZero>0)
+	 {
+		size_t LZeroW = 0x80000000 + LZero;
+		comp_node_number.push_back(LZeroW);
+	 }
+	 //gtt += clock()-tq;
+	 /*cout<<node_number<<":";
+	 for(auto word : comp_node_number_1)
+		cout<<hex<<word<<"	";
+		//cout<<dec<<word<<"	";
+	 cout<<endl<<"=========\n";
+	 
+	 cout<<"\n++++++++++++++++++\n";
+	
+	cout<<node_number<<":";
+	for(auto word : comp_node_number)
+		cout<<hex<<word<<"	";
+		//cout<<dec<<word<<"	";
+	cout<<endl<<"=========\n";
+	*/
+	for(int i = number_of_bins-1;i>=0;i--)
+	{
+		//// =================   debug ==============================
+			/*//cout<<dec<<"\n\nn#:"<<node_number<<" idx:"<<itemsCount-node_number<<hex<<"\nCompN#:\n";
+			cout<<endl;
+			for(auto w: comp_node_number)
+				cout<<hex<<w<<"	";
+			cout<<endl<<"bin:\n";
+			for(auto w: (*firstlevelvectors)[i])
+				cout<<w<<"	";
+			cout<<endl<<dec<<endl;
+			//assert(false);*/
+		////=========================================================
+		// clock_t tq = clock();
+		vector<size_t> comp_and_result = Bitops.logic_and_ref(comp_node_number,(*firstlevelvectors)[i]); // pass by reference Bottle neck
+		// gtt += clock()-tq;
+		//k0++;
+		//if(clock()-tq>0)
+			
+			//cout<<clock()-tq<<"comp_node_number.size:"<<comp_node_number.size()<<"  (*firstlevelvectors)[i].size:"<<(*firstlevelvectors)[i].size()<<endl;
+		
+		
+		for(size_t word : comp_and_result) //if(compressed_and_result.any())
+		{
+			int WType = Bitops.word_type(word);
+			if(DebugMode)
+				cout<<"word type:"<<WType<<"	word:"<<hex<<word<<endl;
+			if( WType == 0 || WType == 2)// if the word is literal or ones fill word 
+			{
+				if(DebugMode)
+					cout<<"debug6\n";
+				result = new pair<int,int>;
+				result->first = (*firstlevelvalue)[i].min_val/numpres;
+				result->second= (*firstlevelvalue)[i].max_val/numpres;
+				return result;
+			}
+		}
+	
+	}
+	
+	if (result == NULL)
+	{
+			cout<<"Exception: debug8-null val returned\n";
+			cout<<node_number<<endl;
+	}
+	return result; 
+}
+/*
+pair<int,int> * Bitmap<a_type>:: chunk_get_value(int node_number)
 {
 	pair<int,int>* result = NULL; 
 	// 
@@ -319,7 +446,6 @@ pair<int,int> * Bitmap<a_type>:: get_value(int node_number)
 		//cout<<hex<<w<<"	";
 	//cout<<endl<<endl<<dec;	
 	
-	/*
     ////1. fast setbit compression=====================	
 	//// make a bitvector with the chuck_index bit set and then compress it to comp_chunk_index
 	
@@ -343,7 +469,7 @@ pair<int,int> * Bitmap<a_type>:: get_value(int node_number)
 			size_t LZeroW = 0x80000000 + LZero;
 			comp_chunk_index.push_back(LZeroW);
 		 }
-	*/ 
+	
 	
 	////2. check bitvectors ============================
 	//// iterates over the bitvectors in the bitmap 
@@ -357,7 +483,8 @@ pair<int,int> * Bitmap<a_type>:: get_value(int node_number)
 		//clock_t tq = clock();
 		//bool t = isInBitvector(bitvector_index,chunk_number, comp_chunk_index);
 		//gtt += clock()-tq;
-		if(isInBin(bitvector_index,chunk_number, comp_chunk_index))
+		if(isInBin(bitvector_index,chunk_number, comp_chun
+		k_index))
 		{
 			////== retun bin.stat ==
 			result = new pair<int,int>;
@@ -375,7 +502,8 @@ pair<int,int> * Bitmap<a_type>:: get_value(int node_number)
 	}
 	return result; 
 }
-template <class a_type>
+*/
+/*template <class a_type>
 bool Bitmap<a_type>:: isInBin(int bitvector_index, int chunk_number, vector<size_t>& comp_chunk_index)
 {	
  ////  logic_and the compressed bin with the comp_chunk_index and check if result.any()
@@ -398,7 +526,7 @@ bool Bitmap<a_type>:: isInBin(int bitvector_index, int chunk_number, vector<size
 		}
 		return false;
 }
-
+*/
 /*
  * Find the cardinality of high-level bitmap indices (Omid: or number of high-level bins)
  */
@@ -501,6 +629,39 @@ void Bitmap<a_type>:: print_stat()
 		i++;
 	}
 }
+
+template <class a_type>
+void save_bitmap(string dir)
+{
+	// save_secondlevelvectors(dir);
+	// save_firstlevelvectors(dir);
+
+	// save_firstlevelvalue(dir);
+
+	// save_second_level_statistics(dir);
+	// save_first_level_statistics(dir);
+	
+	// save_second_level_sums(dir);
+	// save_first_level_sums(dir);
+}
+// template <class a_type>
+// void load_bitmap(string dir)
+// {
+// 	load_secondlevelvectors(dir);
+// 	load_firstlevelvectors(dir);
+
+// 	load_firstlevelvalue(dir);
+
+// 	load_second_level_statistics(dir);
+// 	load_first_level_statistics(dir);
+	
+// 	load_second_level_sums(dir);
+// 	load_first_level_sums(dir);
+// } 
+
+
+
+
 template class Bitmap<double>;
 template class Bitmap<float>;
 template class Bitmap<int>;
