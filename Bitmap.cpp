@@ -11,7 +11,7 @@ using namespace std;
  * the constructor function
  */
 template <class a_type> 
-Bitmap<a_type>::Bitmap(a_type* array, unsigned long items){
+Bitmap<a_type>::Bitmap(string dir,a_type* array, unsigned long items){
 	clock_t t0 = clock();
 	itemsCount = 0;// initially set the number of the items to 0
 	firstlevelvalue = new vector<struct index_bin>();// a vector of the the min and max values of the first level bins
@@ -176,6 +176,14 @@ Bitmap<a_type>::Bitmap(a_type* array, unsigned long items){
 	cout<<"number of low-level bins:"<<(*secondlevelvectors).size()<<endl;
 	cout<<"number of high-level bins:"<<(*firstlevelvectors).size()<<endl;
 	cout<<"======================\n";
+	cout<<"Saving bitmap on ..."<<endl;
+	save_bitmap(dir);
+	
+}
+template <class a_type> 
+Bitmap<a_type>::Bitmap(string dir){
+	cout<<"Loading bitmap...\n";
+	load_bitmap(dir);
 }
 /*
  * The destructor function
@@ -881,7 +889,6 @@ void Bitmap<a_type>::load_first_level_statistics(string dir)
 	}
 	myfile.close();
 }
-
 template class Bitmap<double>;
 template class Bitmap<float>;
 template class Bitmap<int>;

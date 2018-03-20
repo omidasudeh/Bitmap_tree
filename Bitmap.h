@@ -66,6 +66,8 @@ private:
 	 */ 
 	void setPrecision();
 ////############################# save/load functions ###################################
+void save_bitmap(string dir);
+void load_bitmap(string dir); 
 void save_variables(string dir);
 void save_secondlevelvectors(string dir);
 void save_firstlevelvectors(string dir);
@@ -86,7 +88,8 @@ void load_first_level_statistics(string dir);
 
 public:
 	
-	Bitmap(a_type* array, unsigned long items);
+	Bitmap(string dir,a_type* array, unsigned long items);
+	Bitmap(string dir);
 	~Bitmap();	
 	/*making the pre-aggregation statistics*/
 	void calcPreAgg();
@@ -141,10 +144,6 @@ public:
 	
 	/*prints the pre-aggregation statistics*/
 	void print_stat();
-	////########################## save/load file ###########################
-	void save_bitmap(string dir);
-	void load_bitmap(string dir); 
-
 
 };
 #endif

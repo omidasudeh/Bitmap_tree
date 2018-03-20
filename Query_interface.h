@@ -55,7 +55,8 @@ class Query_interface {
 		int tree_access = 0;
 		int bitmap_access = 0;
 	public:
-		Query_interface(size_t* array,unsigned long items, int DX,int DY, int DZ,size_t* aggregates, unsigned long aggregate_items, boost::dynamic_bitset<> BR);
+		Query_interface(string dir, int DX,int DY, int DZ);
+		Query_interface(string dir,size_t* array,unsigned long items, int DX,int DY, int DZ,size_t* aggregates, unsigned long aggregate_items, boost::dynamic_bitset<> BR);//generates bitmaps
 		~Query_interface();
 		int  Query(pair<point,point> query_region);
 		void print_access_log();

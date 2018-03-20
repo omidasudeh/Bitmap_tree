@@ -87,23 +87,6 @@ class DataGenerator
 				matrix.push_back(plain);				
 			}
 		}
-
-		/*
-		prints the matrix
-		*/
-		// void print()
-		// {
-		// 	int MaxX = matrix.size();
-		// 	for(int i=0;i<MaxX;i++)
-		// 	{
-		// 		int MaxY = matrix[i].size();
-		// 		for(int j=0 ;j<MaxY;j++)
-		// 		{
-		// 			cout<< matrix[i][j]<<"	";
-		// 		}
-		// 		cout<<endl;
-		// 	}
-		// }
 		/*
 		saves the matrix in a output file with the address dir
 		*/
@@ -615,115 +598,6 @@ class DataGenerator
 			//cout<<result->at(0)<<"	"<<result->at(result->size()-1)<<endl;
 			return result;
 		}
-		// int query(int x1, int y1, int x2, int y2)
-		// {
-
-		// 	step = 0;
-		// 	int result = query_helper(x1, y1, x2, y2,root);
-		// 	cout<<"# of getvals:"<<step<<"\n";
-		// 	return result;
-
-		// }
-		// int query_helper(int x1, int y1, int x2, int y2, tree_node* node)
-		// {
-		// 	if(DebugMode)
-		// 		cout<<"Query("<<x1<<","<<y1<<" "<<x2<<","<<y2<<") over ("<<node->X1<<","<<node->Y1<<" "<<node->X2<<","<<node->Y2<<")"<<endl;
-		// 	//cout<<"=============================="<<endl;
-		// 	//step++;
-		// 	//assert(step!=10);
-		// 	if(x1==node->X1 && y1 == node->Y1 && x2==node->X2 && y2 == node->Y2)
-		// 	{
-		// 		//cout<<"exact value:"<<node->value<<endl;
-		// 		step++;
-		// 		return node->value;
-		// 	}
-		// 	float r1 = 0;
-		// 	float r2 = 0;
-		// 	float r3 = 0;
-		// 	float r4 = 0;
-
-		// 	pair<pair<int,int>, pair<int,int>>* a1 = NULL;
-		// 	pair<pair<int,int>, pair<int,int>>* a2 = NULL;
-		// 	pair<pair<int,int>, pair<int,int>>* a3 = NULL;
-		// 	pair<pair<int,int>, pair<int,int>>* a4 = NULL;
-		// 	if(node->first!=NULL)
-		// 		a1 = overlap(x1, y1, x2, y2, node->first);
-		// 	//cout<<"here0"<<endl;
-		// 	if(node->second!=NULL)
-		// 		a2 = overlap(x1, y1, x2, y2, node->second);
-		// 	//cout<<"here1"<<endl;
-		// 	if(node->third!=NULL)
-		// 		a3 = overlap(x1, y1, x2, y2, node->third);
-		// 	//cout<<"here2"<<endl;
-		// 	if(node->forth!=NULL)
-		// 		a4 = overlap(x1, y1, x2, y2, node->forth);
-		// 	//cout<<a1<<" "<<a2<<" "<<a3<<" "<<a4<<endl;
-		// 	if(a1!=NULL)
-		// 	{
-		// 		//cout<<"here0"<<endl;
-		// 		//cout<<(a1->first).first<<","<<(a1->first).second<<" "<<(a1->second).first<<","<<(a1->second).second<<endl;
-		// 		r1 = query_helper((a1->first).first,(a1->first).second,(a1->second).first,(a1->second).second, node->first);
-		// 	}
-		// 	/*else
-		// 		cout<<"a1 is null"<<endl;*/
-		// 	if(a2!=NULL)
-		// 	{
-		// 		//cout<<"here1"<<endl;
-		// 		//cout<<(a2->first).first<<","<<(a2->first).second<<" "<<(a2->second).first<<","<<(a2->second).second<<endl;
-		// 		r2 = query_helper((a2->first).first,(a2->first).second,(a2->second).first,(a2->second).second, node->second);
-		// 	}/*
-		// 	else
-		// 		cout<<"a2 is null"<<endl;*/
-		// 	if(a3!=NULL)
-		// 	{
-		// 		//cout<<"here2"<<endl;
-		// 		//cout<<(a3->first).first<<","<<(a3->first).second<<" "<<(a3->second).first<<","<<(a3->second).second<<endl;
-		// 		r3 = query_helper((a3->first).first,(a3->first).second,(a3->second).first,(a3->second).second, node->third);
-		// 	}
-		// 	/*else
-		// 		cout<<"a3 is null"<<endl;*/
-		// 	if(a4!=NULL)
-		// 	{
-		// 		//cout<<"here3"<<endl;
-		// 		//cout<<(a4->first).first<<","<<(a4->first).second<<" "<<(a4->second).first<<","<<(a4->second).second<<endl<<endl;
-		// 		r4 = query_helper((a4->first).first,(a4->first).second,(a4->second).first,(a4->second).second, node->forth);
-		// 	}
-		// 	/*else
-		// 		cout<<"a4 is null"<<endl;*/
-		// 	//cout<<"------------------------------------"<<endl;
-		// 	//cout<<"r1:"<<r1<<" r2:"<<r2<<" r3:"<<r3<<" r4:"<<r4<<" res:"<<(r1+r2+r3+r4)/4<<endl;
-		// 	return (r1+r2+r3+r4);
-		// }
-		// int max(int a, int b)
-		// {
-		// 	return (a>=b)?a:b;
-		// }
-		// int min(int a, int b)
-		// {
-		// 	return (a<=b)?a:b;
-		// }
-		// pair<pair<int,int>, pair<int,int>>* overlap(int x1, int y1, int x2, int y2, tree_node* node)
-		// {
-		// 	//cout<<"overlap("<<x1<<","<<y1<<" "<<x2<<","<<y2<<")	("<<node->X1<<","<<node->Y1<<" "<<node->X2<<","<<node->Y2<<")"<<endl;
-		// 	pair<pair<int,int>, pair<int,int>>* result = NULL;
-		// 	pair<int,int> top_left;
-		// 	pair<int,int> bottom_right;
-		// 	top_left.first = max(x1, node->X1);
-		// 	top_left.second = max(y1, node->Y1);
-		// 	bottom_right.first = min(x2, node->X2);
-		// 	bottom_right.second = min(y2, node->Y2);
-		// 	if(bottom_right.first<top_left.first || bottom_right.second<top_left.second ) // no overlap between query region and node area
-		// 	{
-		// 		return NULL;
-		// 	}
-		// 	result = new pair<pair<int,int>, pair<int,int>>;
-		// 	result->first.first = top_left.first;
-		// 	result->first.second = top_left.second;
-		// 	result->second.first = bottom_right.first;
-		// 	result->second.second = bottom_right.second;
-		// 	return result;
-
-		// }
 		size_t query_base(int x1, int y1,int z1, int x2, int y2,int z2)
 		{
 			size_t sum = 0;
@@ -749,7 +623,7 @@ cout<<"#################################################"<<endl;
 	bool generate_mode = false;// false mean load; true means generate
 	int cardinality = 100;
 	int dimSize = 512;
-	string directory = "./";
+	string directory = "";
 	int Tree_level = 0;
 	int x1 = 0;
 	int y1 = 0;
@@ -797,13 +671,22 @@ cout<<"#################################################"<<endl;
 	cout<< "Parameters set to:\n";
 	cout<< "--generate:"<<generate_mode<<" cardinality: "<<cardinality<<endl;
 	cout<<"--dimSize:"<<dimSize<<endl;
-	cout<< "--directory:"<<directory<<endl;
+	if(directory!="")
+		cout<< "--directory:"<<directory<<endl;
+	else
+		cout<<"Loads Bitmaps"<<endl;
 	cout<<"--TreeLevel:"<<Tree_level<<endl;
 	cout<<"--Query: ("<<query_region.first.x<<","<<query_region.first.y<<","<<query_region.first.z<<") ("
 					  <<query_region.second.x<<","<<query_region.second.y<<","<<query_region.second.z<<")"<<endl;
+
+
+
+DataGenerator dg (dimSize, dimSize,dimSize, 0,cardinality);
+Query_interface* query_handler;
+if(directory!="")
+{
 ////########################## 1. Data generation ###############################
 cout<<"\n############## Data Generation/load #############"<<endl;
-	DataGenerator dg (dimSize, dimSize,dimSize, 0,cardinality);
 	if(generate_mode){
 		dg.generate();
 		dg.saveAs(directory);
@@ -811,6 +694,7 @@ cout<<"\n############## Data Generation/load #############"<<endl;
 	else{
 		dg.load(directory);
 	}
+
 ////######################## 2. Generate aggregate tree #########################
 clock_t t1,t2=0,t3=0,t4=0,sumtime=0,sumtime1=0,sumtime2=0;
 cout<<"############### Tree Generation #################"<<endl;
@@ -821,63 +705,11 @@ cout<<"############### Tree Generation #################"<<endl;
 	cout<<"tree generation time:"<<((float)t1)/CLOCKS_PER_SEC<<endl;
 	// dg.BFS();
 	// cout<<x1<<","<<y1<<","<<z1<<","<<x2<<","<<y2<<","<<z2<<endl;
-size_t R1 = dg.query_base(query_region.first.x,query_region.first.y,query_region.first.z,query_region.second.x,query_region.second.y,query_region.second.z);
+size_t R1 = dg.query_base(query_region.first.x,query_region.first.y,query_region.
+				first.z,query_region.second.x,query_region.second.y,query_region.second.z);
 
 cout<<"\n#################################################"<<endl;	
 cout<<"exact query result:"<<R1<<endl;
-int rep = 1;
-/*
-////########################## 3. Exact queries #################################
-cout<<"################ Exact Query #####################"<<endl;
-cout<<"\n=================\nbaseline:\n";
-for(int i = 0 ; i<11;i++)// increase the query size
-//for(int i = 0 ; i<4;i++)// increase the query size
-{
-	//base line
-	for(int j = 0;j<rep;j++)// repeat the query 10 times
-	{
-		//Query the tree
-		int R1 = 0;
-		t2=0;
-		t2 = clock();
-		//R1 = dg.query_base(0,0,499*i,499*i);
-		R1 = dg.query_base(0,0,49*i,49*i);
-		/////baseline query
-		//R1 = dg.query_base(0,0,i,i);
-
-		//cout<<R1<<"\t";
-		t2 = clock()-t2;
-		sumtime1+=t2;
-	}
-	cout<<sumtime1/rep<<endl;
-}
-cout<<"\n==================\ntree:\n";
-for(int i = 0 ; i<11;i++)// increase the query size
-//for(int i = 0 ; i<4;i++)// increase the query size
-{
-	//tree based aggregation
-	//cout<<"(0,0,"<<499*i<<","<<499*i<<") treeBased: ";
-	////cout<<"(0,0,"<<50*i<<","<<50*i<<") treeBased: ";
-	//cout<<"(0,0,"<<i<<","<<i<<") treeBased: ";
-	//for(int j = 0;j<rep;j++)// repeat the query 10 times
-	//{
-		//Query the tree
-		int R = 0;
-		t2 = clock();
-		//R = dg.query(0,0,499*i,499*i);
-		R = dg.query(0,0,49*i,49*i);
-		t2 = clock()-t2;
-		///tree query
-		//R = dg.query(0,0,i,i);
-		//if(j==0 )
-		cout<<"exact sum="<<R<<endl;
-
-		//sumtime+=t2;
-	//}
-	//cout<<sumtime/rep<<endl;
-	cout<<"time:"<<t2<<endl<<"========\n";
-}
-*/
 
 ////################### 3. Convert aggregate tree to array #####################
 cout<<"\n#################################################"<<endl;	
@@ -886,49 +718,19 @@ cout<<"preparing Aggregate-Tree for Bitmap Generation"<<endl;
 	//dg.BFS();
 	boost::dynamic_bitset<> Bit_representator;
 	vector<size_t>* aggregates = dg.BFS_max_depth(Tree_level,Bit_representator);
-	// cout<<aggregates->at(0);
-////################### 4. Convert aggregate tree to Bitmap #####################
 cout<<"\n#################################################"<<endl;	
-cout<<"Aggregate-Tree Bitmap Generation"<<endl;
-////######################## VVVVVVVV Here! VVVVVVVV ############################
-
-Query_interface query_handler(dg.get_array(),dg.get_count(),dg.get_DimX(),dg.get_DimY(),dg.get_DimZ(),
+////######################## Query Here! VVVVVVVV ############################
+	query_handler = new Query_interface("../data/bitmap/",dg.get_array(),dg.get_count(),dg.get_DimX(),dg.get_DimY(),dg.get_DimZ(),
 								&(aggregates->at(0)),aggregates->size(), Bit_representator);//generate the bitmaps ready to query
 
-
-int result = query_handler.Query(query_region);
-cout<<"combined result:"<<result<<endl;
-
-query_handler.print_access_log();
-float error = abs(R1-result)/float(R1);
-cout<<"accuracy: "<<1-error<<endl;
-/*
-
-cout<<"################ Approximate Query ###############"<<endl;
-for(int i = 0 ; i<11;i++)// increase the query size
-//for(int i = 0 ; i<4;i++)// increase the query size
-{
-	//tree based aggregation
-	////cout<<"(0,0,"<<50*i<<","<<50*i<<") bitmap  based: ";
-	//cout<<"(0,0,"<<i<<","<<i<<") bitmap  based: ";
-	//for(int j = 0;j<rep;j++)// repeat the query 10 times
-	//{
-	//	//Query the tree
-		int R1 = 0;
-		t2 = clock();
-		/////approximate Query
-		//query_handler.query();
-		//R1 = query_handler.query(0,0,i,i,dg.get_DimX(),dg.get_DimY());
-		//R1 = query_handler.query(0,0,499*i,499*i,dg.get_DimX(),dg.get_DimY());
-		R1 = query_handler.query(0,0,49*i,49*i,dg.get_DimX(),dg.get_DimY());
-		//if(j==0 )
-			cout<<" approx sum="<<R1<<endl;
-		t2 = clock()-t2;
-		//sumtime2+=t2;
-	//}
-	//cout<<sumtime2/rep<<endl;
-		cout<<"time:"<<t2<<endl<<"========\n";
 }
-*/
-	return 0;
+else 
+    query_handler = new Query_interface("../data/bitmap/",dimSize,dimSize,dimSize);
+
+int result = query_handler->Query(query_region);
+cout<<"combined result:"<<result<<endl;
+query_handler->print_access_log();
+
+
+return 0;
 }
