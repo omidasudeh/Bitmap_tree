@@ -679,6 +679,7 @@ cout<<"#################################################"<<endl;
 	cout<<"--Query: ("<<query_region.first.x<<","<<query_region.first.y<<","<<query_region.first.z<<") ("
 					  <<query_region.second.x<<","<<query_region.second.y<<","<<query_region.second.z<<")"<<endl;
 
+	cout<<"======================\n";
 
 
 DataGenerator dg (dimSize, dimSize,dimSize, 0,cardinality);
@@ -725,8 +726,9 @@ cout<<"\n#################################################"<<endl;
 
 }
 else 
-    query_handler = new Query_interface("../data/bitmap/",dimSize,dimSize,dimSize);
+    query_handler = new Query_interface(dimSize,dimSize,dimSize);
 
+// cout<<"here!!!\n";
 int result = query_handler->Query(query_region);
 cout<<"combined result:"<<result<<endl;
 query_handler->print_access_log();

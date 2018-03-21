@@ -83,7 +83,7 @@ Bitmap<a_type>::Bitmap(string dir,a_type* array, unsigned long items){
 		for(int j=0; j<bitvectors[i].size(); j++) {
 		  tempvector[bitvectors[i][j]] = 1;
 		}
-		cout<<"here compress"<<endl;
+		// cout<<"here compress"<<endl;
 
 		secondlevelvectors->push_back(Bitops.compressBitset(tempvector));
 	}
@@ -148,14 +148,15 @@ Bitmap<a_type>::Bitmap(string dir,a_type* array, unsigned long items){
 	cout<<"number of low-level bins:"<<(*secondlevelvectors).size()<<endl;
 	cout<<"number of high-level bins:"<<(*firstlevelvectors).size()<<endl;
 	cout<<"======================\n";
-	cout<<"Saving bitmap on ..."<<endl;
-	save_bitmap(dir);
-	
+	calcPreAgg();
+	save_bitmap(dir);	
 }
 template <class a_type> 
-Bitmap<a_type>::Bitmap(string dir){
+Bitmap<a_type>::Bitmap(string dir){	
 	cout<<"Loading bitmap...\n";
+	// cout<<dir<<endl;
 	load_bitmap(dir);
+	cout<<"======================\n";
 }
 /*
  * The destructor function
@@ -291,7 +292,6 @@ pair<int,int> * Bitmap<a_type>:: get_value(int node_number)
 	pair<int,int>* result = NULL; 
 	int number_of_bins = (*firstlevelvectors).size();
 	
-	
 	/* 	//////// naive get_node_value approach
 	 * fun to work with
 	 * well communicate
@@ -373,7 +373,9 @@ pair<int,int> * Bitmap<a_type>:: get_value(int node_number)
 			//assert(false);*/
 		////=========================================================
 		// clock_t tq = clock();
+
 		vector<size_t> comp_and_result = Bitops.logic_and_ref(comp_node_number,(*firstlevelvectors)[i]); // pass by reference Bottle neck
+		
 		// gtt += clock()-tq;
 		//k0++;
 		//if(clock()-tq>0)
@@ -381,6 +383,8 @@ pair<int,int> * Bitmap<a_type>:: get_value(int node_number)
 			//cout<<clock()-tq<<"comp_node_number.size:"<<comp_node_number.size()<<"  (*firstlevelvectors)[i].size:"<<(*firstlevelvectors)[i].size()<<endl;
 		
 		
+	
+	
 		for(size_t word : comp_and_result) //if(compressed_and_result.any())
 		{
 			int WType = Bitops.word_type(word);
@@ -513,14 +517,14 @@ void Bitmap<a_type>:: print_stat()
 template <class a_type>
 void Bitmap<a_type>::save_bitmap(string dir)
 {
-	save_variables(dir+"variables");
-	save_secondlevelvectors(dir+"secondlevelvectors");
-	save_firstlevelvectors(dir+"firstlevelvectors");
+	save_variables(dir+"variables.txt");
+	save_secondlevelvectors(dir+"secondlevelvectors.txt");
+	save_firstlevelvectors(dir+"firstlevelvectors.txt");
 
-	save_firstlevelvalue(dir+"firstlevelvalue");
+	save_firstlevelvalue(dir+"firstlevelvalue.txt");
 
-	save_second_level_statistics(dir+"second_level_statistics");
-	save_first_level_statistics(dir+"first_level_statistics");
+	save_second_level_statistics(dir+"second_level_statistics.txt");
+	save_first_level_statistics(dir+"first_level_statistics.txt");
 	
 	// save_second_level_sums(dir);
 	// save_first_level_sums(dir);
@@ -530,9 +534,13 @@ void Bitmap<a_type>::save_variables(string dir)
 {
 	////file structure:
 	////first line: numpress minvalue maxvalue itemCounts
+	cout<<"Saving variables on"<<dir<<endl;
 	ofstream myfile;
 	myfile.open (dir);
-	myfile<<numpres<<" "<<minvalue<<" "<<maxvalue<<" "<<itemsCount<<endl;
+	if(myfile.is_open())
+		myfile<<numpres<<" "<<minvalue<<" "<<maxvalue<<" "<<itemsCount<<endl;
+	else
+		cout<<"Saving secondlevelvectors on"<<dir<<endl;		
 	myfile.close();
 }
 
@@ -542,19 +550,25 @@ void Bitmap<a_type>::save_secondlevelvectors(string dir)
 	////file structure:
 	////first line: number of bins
 	////other lines: start with number or words in the bin, followed by other words
+	cout<<"Saving secondlevelvectors on"<<dir<<endl;
 
 	ofstream myfile;
 	myfile.open (dir);
-	myfile<<secondlevelvectors->size()<<endl;          ////first line: number of bins
-	for(auto bin :(*secondlevelvectors))
+	if(myfile.is_open())
 	{
-		myfile<<bin.size()<<" ";
-		for(size_t word : bin)
+		myfile<<secondlevelvectors->size()<<endl;          ////first line: number of bins
+		for(auto bin :(*secondlevelvectors))
 		{
-			myfile<<word<<" ";
+			myfile<<bin.size()<<" ";
+			for(size_t word : bin)
+			{
+				myfile<<word<<" ";
+			}
+			myfile<<endl;
 		}
-		myfile<<endl;
 	}
+	else
+		cout<<"Could not open file "<<dir<<endl;												
 	myfile.close();
 }
 template <class a_type>
@@ -563,19 +577,25 @@ void Bitmap<a_type>::save_firstlevelvectors(string dir)
 	////file structure:
 	////first line: number of bins
 	////other lines: start with number or words in the bin, followed by other words
+	cout<<"Saving firstlevelvectors on"<<dir<<endl;
 
 	ofstream myfile;
 	myfile.open (dir);
-	myfile<<firstlevelvectors->size()<<endl;          ////first line: number of bins
-	for(auto bin :(*firstlevelvectors))
-	{
-		myfile<<bin.size()<<" ";
-		for(size_t word : bin)
+	if(myfile.is_open())
+	{	
+		myfile<<firstlevelvectors->size()<<endl;          ////first line: number of bins
+		for(auto bin :(*firstlevelvectors))
 		{
-			myfile<<word<<" ";
+			myfile<<bin.size()<<" ";
+			for(size_t word : bin)
+			{
+				myfile<<word<<" ";
+			}
+			myfile<<endl;
 		}
-		myfile<<endl;
 	}
+	else
+		cout<<"Could not open file "<<dir<<endl;										
 	myfile.close();
 }
 template <class a_type>
@@ -584,13 +604,20 @@ void Bitmap<a_type>::save_firstlevelvalue(string dir)
 	////file structure:
 	////first line: number of lines
 	////other lines: min max
+	cout<<"Saving firstlevelvalue on"<<dir<<endl;
+	
 	ofstream myfile;
 	myfile.open (dir);
-	myfile<<firstlevelvalue->size()<<endl;
-	for(auto bin_boundary :(*firstlevelvalue))
-	{
-		myfile<<bin_boundary.min_val<<" "<<bin_boundary.max_val<<endl;
+	if(myfile.is_open())
+	{	
+		myfile<<firstlevelvalue->size()<<endl;
+		for(auto bin_boundary :(*firstlevelvalue))
+		{
+			myfile<<bin_boundary.min_val<<" "<<bin_boundary.max_val<<endl;
+		}
 	}
+	else
+		cout<<"Could not open file "<<dir<<endl;								
 	myfile.close();
 }
 
@@ -600,13 +627,20 @@ void Bitmap<a_type>::save_second_level_statistics(string dir)
 	////file structure:
 	////first line: number of lines
 	////other lines: sum count min max
+	cout<<"Saving second_level_statistics on"<<dir<<endl;
+	
 	ofstream myfile;
 	myfile.open (dir);
-	myfile<<second_level_statistics.size()<<endl;          ////first line: number of bins
-	for(auto bin_stat :second_level_statistics)
+	if(myfile.is_open())
 	{
-		myfile<<bin_stat.sum<<" "<<bin_stat.count<<" "<<bin_stat.min<<" "<<bin_stat.max<<endl;
+		myfile<<second_level_statistics.size()<<endl;          ////first line: number of bins
+		for(auto bin_stat :second_level_statistics)
+		{
+			myfile<<bin_stat.sum<<" "<<bin_stat.count<<" "<<bin_stat.min<<" "<<bin_stat.max<<endl;
+		}
 	}
+	else
+		cout<<"Could not open file "<<dir<<endl;						
 	myfile.close();
 }
 template <class a_type>
@@ -615,27 +649,34 @@ void Bitmap<a_type>::save_first_level_statistics(string dir)
 	////file structure:
 	////first line: number of lines
 	////other lines: sum count min max
+	cout<<"Saving first_level_statistics on"<<dir<<endl;
+	
 	ofstream myfile;
 	myfile.open (dir);
-	myfile<<first_level_statistics.size()<<endl;          ////first line: number of bins	
-	for(auto bin_stat :first_level_statistics)
+	if(myfile.is_open())
 	{
-		myfile<<bin_stat.sum<<" "<<bin_stat.count<<" "<<bin_stat.min<<" "<<bin_stat.max<<endl;
+		myfile<<first_level_statistics.size()<<endl;          ////first line: number of bins	
+		for(auto bin_stat :first_level_statistics)
+		{
+			myfile<<bin_stat.sum<<" "<<bin_stat.count<<" "<<bin_stat.min<<" "<<bin_stat.max<<endl;
+		}
 	}
+	else
+		cout<<"Could not open file "<<dir<<endl;				
 	myfile.close();
 }
 
 template <class a_type>
 void Bitmap<a_type>:: load_bitmap(string dir)
 {
-	load_variables(dir+"variables");
-	load_secondlevelvectors(dir+"secondlevelvectors");
-	load_firstlevelvectors(dir+"firstlevelvectors");
+	load_variables(dir+"variables.txt");
+	load_secondlevelvectors(dir+"secondlevelvectors.txt");
+	load_firstlevelvectors(dir+"firstlevelvectors.txt");
 
-	load_firstlevelvalue(dir+"firstlevelvalue");
+	load_firstlevelvalue(dir+"firstlevelvalue.txt");
 
-	load_second_level_statistics(dir+"second_level_statistics");
-	load_first_level_statistics(dir+"first_level_statistics");
+	load_second_level_statistics(dir+"second_level_statistics.txt");
+	load_first_level_statistics(dir+"first_level_statistics.txt");;
 	
 // 	load_second_level_sums(dir);
 // 	load_first_level_sums(dir);
@@ -645,9 +686,18 @@ void Bitmap<a_type>::load_variables(string dir)
 {
 	////file structure:
 	////first line: numpress minvalue maxvalue itemCounts
+	cout<<"Loading variables from "<<dir<<endl;
+	cout<<dir<<endl;
 	ifstream myfile;
 	myfile.open (dir);
-	myfile>>numpres>>minvalue>>maxvalue>>itemsCount;
+	if(myfile.is_open())
+	{
+		myfile>>numpres>>minvalue>>maxvalue>>itemsCount;
+		cout<<"here"<<itemsCount<<endl;
+	}
+	else{
+		cout<<"Could not open file "<<dir<<endl;		
+	}
 	myfile.close();
 }
 
@@ -657,24 +707,31 @@ void Bitmap<a_type>::load_secondlevelvectors(string dir)
 	////file structure:
 	////first line: number of bins
 	////other lines: start with number or words in the bin, followed by other words
+	cout<<"Loading secondlevelvectors from "<<dir<<endl;
 
 	ifstream myfile;
 	myfile.open (dir);
-	int number_of_bins = 0;
-	myfile>>number_of_bins;          ////first line: number of bins
-	secondlevelvectors = new vector<vector<size_t>>;
-	for(int i = 0;i<number_of_bins;i++)
-	{
-		int number_of_words = 0;
-		vector<size_t> bin;
-		myfile>>number_of_words;
-		for(int j = 0;j< number_of_words;j++)
+	if(myfile.is_open())
+	{	
+		int number_of_bins = 0;
+		myfile>>number_of_bins;          ////first line: number of bins
+		secondlevelvectors = new vector<vector<size_t>>;
+		for(int i = 0;i<number_of_bins;i++)
 		{
-			int word = 0;
-			myfile>>word;
-			bin.push_back(word);
+			int number_of_words = 0;
+			vector<size_t> bin;
+			myfile>>number_of_words;
+			for(int j = 0;j< number_of_words;j++)
+			{
+				size_t word = 0;
+				myfile>>word;
+				bin.push_back(word);
+			}
+			secondlevelvectors->push_back(bin);
 		}
-		secondlevelvectors->push_back(bin);
+	}
+	else{
+		cout<<"Could not open file "<<dir<<endl;		
 	}
 	myfile.close();
 }
@@ -684,24 +741,32 @@ void Bitmap<a_type>::load_firstlevelvectors(string dir)
 	////file structure:
 	////first line: number of bins
 	////other lines: start with number or words in the bin, followed by other words
+	cout<<"Loading firstlevelvectors from "<<dir<<endl;
 
 	ifstream myfile;
 	myfile.open (dir);
-	int number_of_bins = 0;
-	myfile>>number_of_bins;          ////first line: number of bins
-	firstlevelvectors = new vector<vector<size_t>>;
-	for(int i = 0;i<number_of_bins;i++)
+	if(myfile.is_open())
 	{
-		int number_of_words = 0;
-		vector<size_t> bin;
-		myfile>>number_of_words;
-		for(int j = 0;j< number_of_words;j++)
+		int number_of_bins = 0;
+		myfile>>number_of_bins;          ////first line: number of bins
+		firstlevelvectors = new vector<vector<size_t>>;
+		for(int i = 0;i<number_of_bins;i++)
 		{
-			int word = 0;
-			myfile>>word;
-			bin.push_back(word);
+			int number_of_words = 0;
+			vector<size_t> bin;
+			myfile>>number_of_words;
+			for(int j = 0;j< number_of_words;j++)
+			{
+				size_t word = 0;
+				myfile>>word;
+				bin.push_back(word);
+			}
+			firstlevelvectors->push_back(bin);
 		}
-		firstlevelvectors->push_back(bin);
+	}
+	else
+	{
+		cout<<"Could not open file "<<dir<<endl;				
 	}
 	myfile.close();
 }
@@ -711,16 +776,24 @@ void Bitmap<a_type>::load_firstlevelvalue(string dir)
 	////file structure:
 	////first line: number of lines
 	////other lines: min max
+	cout<<"Loading firstlevelvalue from "<<dir<<endl;
+	
 	ifstream myfile;
-	myfile.open (dir);	
-	firstlevelvalue = new vector<struct index_bin>;
-	int number_of_bins = 0;
-	myfile>>number_of_bins;////first line: number of lines
-	for(int i = 0;i<number_of_bins;i++)
-	{
-		index_bin t;
-		myfile>>t.min_val>>t.max_val;
-		firstlevelvalue->push_back(t);
+	myfile.open (dir);
+	if(myfile.is_open())
+	{	
+		firstlevelvalue = new vector<struct index_bin>;
+		int number_of_bins = 0;
+		myfile>>number_of_bins;////first line: number of lines
+		for(int i = 0;i<number_of_bins;i++)
+		{
+			index_bin t;
+			myfile>>t.min_val>>t.max_val;
+			firstlevelvalue->push_back(t);
+		}
+	}
+	else{
+		cout<<"Could not open file "<<dir<<endl;		
 	}
 	myfile.close();
 }
@@ -730,16 +803,23 @@ void Bitmap<a_type>::load_second_level_statistics(string dir)
 	////file structure:
 	////first line: number of lines
 	////other lines: sum count min max
+	cout<<"Loading second_level_statistics from "<<dir<<endl;
+	
 	ifstream myfile;
 	myfile.open (dir);	
-	int number_of_bins = 0;
-	myfile>>number_of_bins;////first line: number of lines
-	for(int i = 0;i<number_of_bins;i++)
+	if(myfile.is_open())
 	{
-		stat t;
-		myfile>>t.sum>>t.count>>t.min>>t.max;
-		second_level_statistics.push_back(t);
+		int number_of_bins = 0;
+		myfile>>number_of_bins;////first line: number of lines
+		for(int i = 0;i<number_of_bins;i++)
+		{
+			stat t;
+			myfile>>t.sum>>t.count>>t.min>>t.max;
+			second_level_statistics.push_back(t);
+		}
 	}
+	else
+		cout<<"Could not open file "<<dir<<endl;				
 	myfile.close();
 }
 template <class a_type>
@@ -748,16 +828,23 @@ void Bitmap<a_type>::load_first_level_statistics(string dir)
 	////file structure:
 	////first line: number of lines
 	////other lines: sum count min max
+	cout<<"Loading first_level_statistics from "<<dir<<endl;
+	
 	ifstream myfile;
-	myfile.open (dir);	
-	int number_of_bins = 0;
-	myfile>>number_of_bins;////first line: number of lines
-	for(int i = 0;i<number_of_bins;i++)
-	{
-		stat t;
-		myfile>>t.sum>>t.count>>t.min>>t.max;
-		first_level_statistics.push_back(t);
+	myfile.open (dir);
+	if(myfile.is_open())
+	{	
+		int number_of_bins = 0;
+		myfile>>number_of_bins;////first line: number of lines
+		for(int i = 0;i<number_of_bins;i++)
+		{
+			stat t;
+			myfile>>t.sum>>t.count>>t.min>>t.max;
+			first_level_statistics.push_back(t);
+		}
 	}
+	else
+		cout<<"Could not open file "<<dir<<endl;						
 	myfile.close();
 }
 template class Bitmap<double>;

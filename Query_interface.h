@@ -11,6 +11,10 @@ struct point
 	bool operator ==(point p)const{
 		return (x == p.x) && (y == p.y) && (z == p.z);
 	}
+	void print()
+	{
+		cout<<"("<<x<<","<<y<<","<<z<<")\n";
+	}
 };
 class Query_interface {
 	private:
@@ -55,7 +59,7 @@ class Query_interface {
 		int tree_access = 0;
 		int bitmap_access = 0;
 	public:
-		Query_interface(string dir, int DX,int DY, int DZ);
+		Query_interface( int DX,int DY, int DZ);
 		Query_interface(string dir,size_t* array,unsigned long items, int DX,int DY, int DZ,size_t* aggregates, unsigned long aggregate_items, boost::dynamic_bitset<> BR);//generates bitmaps
 		~Query_interface();
 		int  Query(pair<point,point> query_region);

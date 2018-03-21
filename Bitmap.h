@@ -65,6 +65,8 @@ private:
 	 * In the future, we plan to provide an interface for users to specify the bin number
 	 */ 
 	void setPrecision();
+	void calcPreAgg();
+	
 ////############################# save/load functions ###################################
 void save_bitmap(string dir);
 void load_bitmap(string dir); 
@@ -92,7 +94,6 @@ public:
 	Bitmap(string dir);
 	~Bitmap();	
 	/*making the pre-aggregation statistics*/
-	void calcPreAgg();
 	////########################### gets ######################################
 	float get_first_level_sum(int binNumber);
 	float get_first_level_count(int binNumber);

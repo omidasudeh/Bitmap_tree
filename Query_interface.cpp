@@ -4,7 +4,6 @@ Query_interface::Query_interface(string dir,size_t* array,unsigned long items, i
 		cout<<"Creating bitmap tree ...\n";
 		cout<<"items:"<<aggregate_items<<endl;		
 		bitmapTree = new Bitmap<size_t>(dir+"bitmapTree/",aggregates,aggregate_items);
-		bitmapTree->calcPreAgg();
 		//bitmapTree->print_stat();
 		this->Bit_representator = BR;
 		//this->compressed_Bit_representator = compressBitset(BR);
@@ -12,16 +11,15 @@ Query_interface::Query_interface(string dir,size_t* array,unsigned long items, i
 		cout<<"Creating Actual bitmap ...\n";
 		cout<<"items:"<<items<<endl;
 		bitmap = new Bitmap<size_t>(dir+"bitmap/",array,items);	
-		bitmap->calcPreAgg();
 		//bitmap->print_stat();
 		DimX = DX;
 		DimY = DY;
 		DimZ = DZ;
 	}
-Query_interface::Query_interface(string dir, int DX,int DY, int DZ)
+Query_interface::Query_interface(int DX,int DY, int DZ)
 {
-	bitmapTree = new Bitmap<size_t>(dir);
-	bitmap = new Bitmap<size_t>(dir);
+	bitmapTree = new Bitmap<size_t>("../data/bitmap/bitmap/");
+	bitmap = new Bitmap<size_t>("../data/bitmap/bitmapTree/");
 	DimX = DX;
 	DimY = DY;
 	DimZ = DZ;
@@ -55,7 +53,7 @@ int Query_interface:: Query(pair<point,point> query_region){
 
 int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, pair<point, point> node_region){
 
-	// cout<<"tree query\n";
+	 cout<<"tree query\n";
 	int X1 = node_region.first.x;
 	int Y1 = node_region.first.y;
 	int Z1 = node_region.first.z;
@@ -71,19 +69,28 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 	int x2 = query_region.second.x;
 	int y2 = query_region.second.y;
 	int z2 = query_region.second.z;
+	// query_region.first.print();
+	// query_region.second.print();
+	
+	// node_region.first.print();
+	// node_region.second.print();
 	
 	//// if(match(query,region))
 	if(query_region == node_region) // base case: if the query region match the node area
 	{
+		
 		//clock_t tq = clock(); /////bottle neck!!!!!!!!!!!!!!!!!!!!
 		pair<int,int>* node_min_max = bitmapTree->get_value(node_number);// get the bin statistic e.g. : [min:2,max: 10]
+		
 		//gtt += clock()-tq;					
 		int node_value =  (node_min_max->first+node_min_max->second)/2;// assumption: represent the bin with the mid value of the bin range e.g. (2+10)/2=6
 		// cout<<"tree\n";	
 		total_acccess++;
 		tree_access++;
+		
 		return node_value;
 	}	
+
 	/*calculate the node number of the possible children*/
 	int first_child_tree_index = 8*node_number+1;
 	int first_child = bitmap_tree_index(first_child_tree_index);
@@ -200,12 +207,13 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 	
 	//// calculate the subqury regions for the children
 	//cout<<"first_child:" <<first_child<<endl;
-	
 	a1 = TreeOverlap(query_region, first_child_region);
-	//cout<<x1<<","<< y1<<","<< x2<<"," <<y2<<","<<first_child_region->first.first<<","<<first_child_region->first.second<<","<<
+
+	cout<<"come on0\n";
+	// cout<<x1<<","<< y1<<","<< x2<<"," <<y2<<","<<first_child_region->first.first<<","<<first_child_region->first.second<<","<<
 		//first_child_region->second.first<<","<<first_child_region->second.second<<endl;
 	if(a1!=NULL)
-	{
+	{		
 		if(first_child>0) // if the first_child exists
 		{
 			r1 = TreeQuery(*a1, first_child,first_child_region);
@@ -222,13 +230,13 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 			Pdz.push_back(pair<int, int>(z1,z2)); 
 			// cout<<"bitmap query:"<<a1->first.first<<","<<a1->first.second<<","<<a1->second.first<<","<<a1->second.second<<","<<endl;
 			return  BitmapQuery(Pv,Pdx,Pdy,Pdz);
-			
 		}
 	}
-	
+	cout<<"come on1\n";
 	a2 = TreeOverlap(query_region, second_child_region);
 	//cout<<x1<<","<< y1<<","<< x2<<"," <<y2<<","<<second_child_region->first.first<<","<<second_child_region->first.second<<","<<
 		//second_child_region->second.first<<","<<second_child_region->second.second<<endl;
+	
 	if(a2!=NULL)
 	{
 		if(second_child>0) // if the second_child exists
@@ -237,6 +245,7 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 		}
 		else
 		{
+			
 			vector<pair<int, int>> Pv; 
 			Pv.push_back(pair<int, int>(-100000,100000)); // skip the value_based filtering
 			vector<pair<int, int>> Pdx; 
@@ -250,7 +259,7 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 			
 		}
 	}
-	
+	cout<<"come on2\n";
 	a3 = TreeOverlap(query_region, third_child_region);
 	//cout<<x1<<","<< y1<<","<< x2<<"," <<y2<<","<<third_child_region->first.first<<","<<third_child_region->first.second<<","<<
 		//third_child_region->second.first<<","<<third_child_region->second.second<<endl;
@@ -274,6 +283,7 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 			return  BitmapQuery(Pv,Pdx,Pdy,Pdz);
 		}
 	}
+	cout<<"come on3\n";
 	a4 = TreeOverlap(query_region, forth_child_region);
 	//cout<<x1<<","<< y1<<","<< x2<<"," <<y2<<","<<forth_child_region->first.first<<","<<forth_child_region->first.second<<","<<
 		//forth_child_region->second.first<<","<<forth_child_region->second.second<<endl;
@@ -297,6 +307,7 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 			return  BitmapQuery(Pv,Pdx,Pdy,Pdz);
 		}	
 	}
+	cout<<"come on4\n";
 	a5 = TreeOverlap(query_region, fifth_child_region);
 	//cout<<x1<<","<< y1<<","<< x2<<"," <<y2<<","<<forth_child_region->first.first<<","<<forth_child_region->first.second<<","<<
 		//forth_child_region->second.first<<","<<forth_child_region->second.second<<endl;
@@ -320,6 +331,7 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 			return  BitmapQuery(Pv,Pdx,Pdy,Pdz);
 		}	
 	}
+	cout<<"come on5\n";
 	a6 = TreeOverlap(query_region, sixth_child_region);
 	//cout<<x1<<","<< y1<<","<< x2<<"," <<y2<<","<<second_child_region->first.first<<","<<second_child_region->first.second<<","<<
 		//second_child_region->second.first<<","<<second_child_region->second.second<<endl;
@@ -344,7 +356,7 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 			
 		}
 	}
-	
+	cout<<"come on6\n";
 	a7 = TreeOverlap(query_region, seventh_child_region);
 	//cout<<x1<<","<< y1<<","<< x2<<"," <<y2<<","<<third_child_region->first.first<<","<<third_child_region->first.second<<","<<
 		//third_child_region->second.first<<","<<third_child_region->second.second<<endl;
@@ -368,6 +380,7 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 			return  BitmapQuery(Pv,Pdx,Pdy,Pdz);
 		}
 	}
+	cout<<"come on7\n";
 	a8 = TreeOverlap(query_region, eighth_child_region);
 	//cout<<x1<<","<< y1<<","<< x2<<"," <<y2<<","<<forth_child_region->first.first<<","<<forth_child_region->first.second<<","<<
 		//forth_child_region->second.first<<","<<forth_child_region->second.second<<endl;
@@ -391,6 +404,7 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 			return  BitmapQuery(Pv,Pdx,Pdy,Pdz);
 		}	
 	}
+	cout<<"come on8\n";
 	//cout<<r1<<" "<<r2<<" "<<r3<<" "<<r4<<" "<<r1+r2+r3+r4<<endl;
 	//assert(false);
 	return r1+r2+r3+r4+r5+r6+r7+r8;
@@ -436,6 +450,7 @@ pair<point, point>* Query_interface::TreeOverlap(pair<point, point> query_region
 	point bottom_right;
 	//cout<<"overlap get region---| "<<endl;
 	//cout<<"---------------------|\n"<<endl;
+
 	int X1 = node_region.first.x;
 	int Y1 = node_region.first.y;
 	int Z1 = node_region.first.z;
@@ -477,7 +492,7 @@ pair<point, point>* Query_interface::TreeOverlap(pair<point, point> query_region
 }
 float Query_interface::BitmapQuery(vector<pair<int, int>> Pv, vector<pair<int, int>> Pdx,vector<pair<int, int>> Pdy, vector<pair<int, int>> Pdz)
 {
-	// cout<<"bitmap\n";
+	cout<<"bitmap\n";
 	total_acccess++;
 	bitmap_access++;
 	//============== value based filtering; lines 1-7 in 2015 paper algo.
@@ -491,22 +506,25 @@ float Query_interface::BitmapQuery(vector<pair<int, int>> Pv, vector<pair<int, i
 		}
 		i++;
 	}
-	//assert(false);
+	// assert(false);
 	//============== dimension based filtering ; lines 9-15 in 2015 paper algo.
 	
 	//cout<<"here3"<<Pdx[0].first<<","<<Pdx[0].second<<Pdy[0].first<<","<<Pdy[0].second<<endl;
 	vector<size_t> transalted_pd = translate(Pdx, Pdy,Pdz);
+	// assert(false);
+
 	//for(auto w:transalted_pd)
 		//cout<<w;
 	//cout<<endl;
 	unordered_map<int,int>* count_array = new unordered_map<int,int>;
+	// cout<<value_based_filtered_bins.size();
 	for(int bin_number:value_based_filtered_bins)
 	{
 		vector<size_t> result = Bitops.logic_and(bitmap->get_firstlevelvector(bin_number),transalted_pd); // make sure to do it by reference
 		boost::dynamic_bitset<> bit_result = Bitops.uncompressIndex(result, bitmap->get_count());// unefficient!!
 		count_array->insert(pair<int, int> (bin_number,bit_result.count()));  // uses the boost's count function
 	}
-	//assert(false);
+	// assert(false);
 	//for (auto elem:*count_array)
 		//cout<<"bin"<<elem.first<<" count:"<<elem.second<<"	";
 	float approx_sum = approximate_sum(count_array);
@@ -551,19 +569,20 @@ bool Query_interface::rangeOverlap(pair<int, int> b, vector<pair<int,int>> Pv)
 /*translates the dimension based query into a bitvector predicate*/
 vector<size_t> Query_interface::translate (vector<pair<int, int>> Pdx,vector<pair<int, int>> Pdy,vector<pair<int, int>> Pdz)
 {
-	//cout<<"here2"<<endl;
 	boost::dynamic_bitset<> pd(bitmap->get_count());// make an output bitvector of the size of the input data
+	// cout<<bitmap->get_count()<<endl;
 	for(auto x_pair:Pdx )// for each partial range of x-dimension in the query
 	{
+		
 		int x1 = x_pair.first;
 		int x2 = x_pair.second;
-		//cout<<"here1"<<endl;
 		for(auto y_pair: Pdy)//for each partial range of ranges of y-dimension in the query
 		{
+			
 			int y1 = y_pair.first;
 			int y2 = y_pair.second;
 			for(auto z_pair:Pdz)// for each partial range of z-dimension in the query
-			{
+			{				
 				int z1 = z_pair.first;
 				int z2 = z_pair.second;
 				for(int i = x1;i<=x2;i++)// sweep the x-axis
@@ -575,7 +594,8 @@ vector<size_t> Query_interface::translate (vector<pair<int, int>> Pdx,vector<pai
 			
 		}
 	}
-	//cout<<pd<<endl;
+	assert(false);
+	
 	return Bitops.compressBitset(pd);
 }
 void Query_interface::print_access_log()
