@@ -18,11 +18,12 @@ Query_interface::Query_interface(string dir,size_t* array,unsigned long items, i
 	}
 Query_interface::Query_interface(int DX,int DY, int DZ)
 {
-	bitmapTree = new Bitmap<size_t>("../data/bitmap/bitmap/");
-	bitmap = new Bitmap<size_t>("../data/bitmap/bitmapTree/");
+	bitmapTree = new Bitmap<size_t>("../data/bitmap/bitmapTree/");
+	bitmap = new Bitmap<size_t>("../data/bitmap/bitmap/");
 	DimX = DX;
 	DimY = DY;
 	DimZ = DZ;
+	// cout<<bitmap->get_count()<<"  "<<bitmapTree->get_count()<<endl;
 }
 Query_interface::~Query_interface(){
 	delete bitmapTree;
@@ -53,7 +54,7 @@ int Query_interface:: Query(pair<point,point> query_region){
 
 int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, pair<point, point> node_region){
 
-	 cout<<"tree query\n";
+	//  cout<<"tree query\n";
 	int X1 = node_region.first.x;
 	int Y1 = node_region.first.y;
 	int Z1 = node_region.first.z;
@@ -209,7 +210,7 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 	//cout<<"first_child:" <<first_child<<endl;
 	a1 = TreeOverlap(query_region, first_child_region);
 
-	cout<<"come on0\n";
+	// cout<<"come on0\n";
 	// cout<<x1<<","<< y1<<","<< x2<<"," <<y2<<","<<first_child_region->first.first<<","<<first_child_region->first.second<<","<<
 		//first_child_region->second.first<<","<<first_child_region->second.second<<endl;
 	if(a1!=NULL)
@@ -232,7 +233,7 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 			return  BitmapQuery(Pv,Pdx,Pdy,Pdz);
 		}
 	}
-	cout<<"come on1\n";
+	// cout<<"come on1\n";
 	a2 = TreeOverlap(query_region, second_child_region);
 	//cout<<x1<<","<< y1<<","<< x2<<"," <<y2<<","<<second_child_region->first.first<<","<<second_child_region->first.second<<","<<
 		//second_child_region->second.first<<","<<second_child_region->second.second<<endl;
@@ -259,7 +260,7 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 			
 		}
 	}
-	cout<<"come on2\n";
+	// cout<<"come on2\n";
 	a3 = TreeOverlap(query_region, third_child_region);
 	//cout<<x1<<","<< y1<<","<< x2<<"," <<y2<<","<<third_child_region->first.first<<","<<third_child_region->first.second<<","<<
 		//third_child_region->second.first<<","<<third_child_region->second.second<<endl;
@@ -283,7 +284,7 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 			return  BitmapQuery(Pv,Pdx,Pdy,Pdz);
 		}
 	}
-	cout<<"come on3\n";
+	// cout<<"come on3\n";
 	a4 = TreeOverlap(query_region, forth_child_region);
 	//cout<<x1<<","<< y1<<","<< x2<<"," <<y2<<","<<forth_child_region->first.first<<","<<forth_child_region->first.second<<","<<
 		//forth_child_region->second.first<<","<<forth_child_region->second.second<<endl;
@@ -307,7 +308,7 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 			return  BitmapQuery(Pv,Pdx,Pdy,Pdz);
 		}	
 	}
-	cout<<"come on4\n";
+	// cout<<"come on4\n";
 	a5 = TreeOverlap(query_region, fifth_child_region);
 	//cout<<x1<<","<< y1<<","<< x2<<"," <<y2<<","<<forth_child_region->first.first<<","<<forth_child_region->first.second<<","<<
 		//forth_child_region->second.first<<","<<forth_child_region->second.second<<endl;
@@ -331,7 +332,7 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 			return  BitmapQuery(Pv,Pdx,Pdy,Pdz);
 		}	
 	}
-	cout<<"come on5\n";
+	// cout<<"come on5\n";
 	a6 = TreeOverlap(query_region, sixth_child_region);
 	//cout<<x1<<","<< y1<<","<< x2<<"," <<y2<<","<<second_child_region->first.first<<","<<second_child_region->first.second<<","<<
 		//second_child_region->second.first<<","<<second_child_region->second.second<<endl;
@@ -356,7 +357,7 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 			
 		}
 	}
-	cout<<"come on6\n";
+	// cout<<"come on6\n";
 	a7 = TreeOverlap(query_region, seventh_child_region);
 	//cout<<x1<<","<< y1<<","<< x2<<"," <<y2<<","<<third_child_region->first.first<<","<<third_child_region->first.second<<","<<
 		//third_child_region->second.first<<","<<third_child_region->second.second<<endl;
@@ -380,7 +381,7 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 			return  BitmapQuery(Pv,Pdx,Pdy,Pdz);
 		}
 	}
-	cout<<"come on7\n";
+	// cout<<"come on7\n";
 	a8 = TreeOverlap(query_region, eighth_child_region);
 	//cout<<x1<<","<< y1<<","<< x2<<"," <<y2<<","<<forth_child_region->first.first<<","<<forth_child_region->first.second<<","<<
 		//forth_child_region->second.first<<","<<forth_child_region->second.second<<endl;
@@ -404,7 +405,7 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 			return  BitmapQuery(Pv,Pdx,Pdy,Pdz);
 		}	
 	}
-	cout<<"come on8\n";
+	// cout<<"come on8\n";
 	//cout<<r1<<" "<<r2<<" "<<r3<<" "<<r4<<" "<<r1+r2+r3+r4<<endl;
 	//assert(false);
 	return r1+r2+r3+r4+r5+r6+r7+r8;
@@ -492,7 +493,7 @@ pair<point, point>* Query_interface::TreeOverlap(pair<point, point> query_region
 }
 float Query_interface::BitmapQuery(vector<pair<int, int>> Pv, vector<pair<int, int>> Pdx,vector<pair<int, int>> Pdy, vector<pair<int, int>> Pdz)
 {
-	cout<<"bitmap\n";
+	// cout<<"bitmap\n";
 	total_acccess++;
 	bitmap_access++;
 	//============== value based filtering; lines 1-7 in 2015 paper algo.
@@ -588,13 +589,17 @@ vector<size_t> Query_interface::translate (vector<pair<int, int>> Pdx,vector<pai
 				for(int i = x1;i<=x2;i++)// sweep the x-axis
 					for(int j= y1;j<=y2;j++)// sweep the y-axis
 						for(int k= z1;k<=z2;k++)// sweep the z-axis
+						{
 							pd[i*DimY*DimZ+j*DimZ+k]=1;
+							// cout<<i<<" "<<j<<" "<<k<<endl;
+						}
 				
 			}
 			
 		}
 	}
-	assert(false);
+	// Bitops.compressBitset(pd);
+	// assert(false);
 	
 	return Bitops.compressBitset(pd);
 }

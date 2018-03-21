@@ -65,6 +65,7 @@ Bitmap<a_type>::Bitmap(string dir,a_type* array, unsigned long items){
 		  bitvectors[varvalmap->find(temp)->second].push_back(i);
 		//}
 	}
+	// this part take a lot of time
 	clock_t t3 = clock();
 	cout<< t3-t2<<endl;
 	//============== calculate second_level_sums
@@ -80,10 +81,11 @@ Bitmap<a_type>::Bitmap(string dir,a_type* array, unsigned long items){
 	cout<< t4-t3<<endl;
 	for(int i=0; i<varvalmap->size(); i++) {
 		boost::dynamic_bitset<> tempvector(items);//////////////
+		cout<<bitvectors[i].size()<<endl;
 		for(int j=0; j<bitvectors[i].size(); j++) {
 		  tempvector[bitvectors[i][j]] = 1;
 		}
-		// cout<<"here compress"<<endl;
+		cout<<"here compress"<<endl;
 
 		secondlevelvectors->push_back(Bitops.compressBitset(tempvector));
 	}
@@ -687,13 +689,13 @@ void Bitmap<a_type>::load_variables(string dir)
 	////file structure:
 	////first line: numpress minvalue maxvalue itemCounts
 	cout<<"Loading variables from "<<dir<<endl;
-	cout<<dir<<endl;
+	// cout<<dir<<endl;
 	ifstream myfile;
 	myfile.open (dir);
 	if(myfile.is_open())
 	{
 		myfile>>numpres>>minvalue>>maxvalue>>itemsCount;
-		cout<<"here"<<itemsCount<<endl;
+		// cout<<"here"<<itemsCount<<endl;
 	}
 	else{
 		cout<<"Could not open file "<<dir<<endl;		
