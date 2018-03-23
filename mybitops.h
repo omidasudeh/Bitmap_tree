@@ -27,7 +27,7 @@ class mybitops{
 	/*
 	 * Use WAH decompression algorithm to decompress all the bitvector
 	 */ 
-	boost::dynamic_bitset<> uncompressIndex(vector<size_t> cvector, unsigned long uncompressed_size);
+	boost::dynamic_bitset<> uncompressIndex(vector<size_t> cvector, size_t uncompressed_size);
 	/*
 	 * Counts the number of setbits upto a certain position
 	 */

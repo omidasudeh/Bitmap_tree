@@ -11,6 +11,9 @@ struct point
 	bool operator ==(point p)const{
 		return (x == p.x) && (y == p.y) && (z == p.z);
 	}
+	bool operator <=(point p)const{
+		return (x <= p.x) && (y <= p.y) && (z <= p.z);
+	}
 	void print()
 	{
 		cout<<"("<<x<<","<<y<<","<<z<<")\n";
@@ -49,18 +52,23 @@ class Query_interface {
 
 		vector<size_t> compressed_Bit_representator;
 		boost::dynamic_bitset<> Bit_representator;
+		int error = 0;
 		////---------------------- methods
 		int  TreeQuery(pair<point,point> query_region,int node_number, pair<point, point>  node_region);
 		int  bitmap_tree_index(int node_number);
 		pair<point,point>*TreeOverlap(pair<point, point> query_region,pair<point, point> node_region);
+		bool match(pair<point, point> query_region,pair<point, point> node_region, int error);
+		
 		///=================================================
 		////###################### Reporting ######################
 		int total_acccess = 0;
 		int tree_access = 0;
 		int bitmap_access = 0;
+		////###################### debugging ######################
+		clock_t tt = 0; 		
 	public:
-		Query_interface( int DX,int DY, int DZ);
-		Query_interface(string dir,size_t* array,unsigned long items, int DX,int DY, int DZ,size_t* aggregates, unsigned long aggregate_items, boost::dynamic_bitset<> BR);//generates bitmaps
+		Query_interface( int DX,int DY, int DZ, int error);
+		Query_interface(string dir,size_t* array,size_t items, int DX,int DY, int DZ,size_t* aggregates, size_t aggregate_items, boost::dynamic_bitset<> BR, int error);//generates bitmaps
 		~Query_interface();
 		int  Query(pair<point,point> query_region);
 		void print_access_log();

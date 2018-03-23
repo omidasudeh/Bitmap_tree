@@ -600,7 +600,7 @@ class DataGenerator
 		}
 		size_t query_base(int x1, int y1,int z1, int x2, int y2,int z2)
 		{
-			size_t sum = 0;
+			size_t sum = 0;	
 			for(int i = x1;i<=x2;i++)
 				for(int j = y1;j<=y2;j++)
 					for(int k = z1;k<=z2;k++)
@@ -620,9 +620,12 @@ cout<<"#################################################"<<endl;
 	cout<<"--directory: address of the input file"<<endl;
 	cout<<"--TreeLevel: number of levels in the aggregate tree; default is 1"<<endl;
 	cout<<"--Query: coordinations of the two points to be queried; default is (x1 = 0,y1 = 0,z1 = 0)(x2 = 128,y2 = 128,z2 = 128)"<<endl;
+	cout<<"--error: bitmapTree acceptance error; default error = 0"<<endl;
+	
 	bool generate_mode = false;// false mean load; true means generate
 	int cardinality = 100;
 	int dimSize = 512;
+	int error = 0;
 	string directory = "";
 	int Tree_level = 0;
 	int x1 = 0;
@@ -666,6 +669,11 @@ cout<<"#################################################"<<endl;
 			i++; query_region.second.y = stoi(argv[i]);
 			i++; query_region.second.z = stoi(argv[i]);
 		}
+		if(arg == "--error")
+		{
+			i++;
+			error = stoi(argv[i]);
+		}
 	}
 	cout<<"\n#################################################"<<endl;	
 	cout<< "Parameters set to:\n";
@@ -678,6 +686,8 @@ cout<<"#################################################"<<endl;
 	cout<<"--TreeLevel:"<<Tree_level<<endl;
 	cout<<"--Query: ("<<query_region.first.x<<","<<query_region.first.y<<","<<query_region.first.z<<") ("
 					  <<query_region.second.x<<","<<query_region.second.y<<","<<query_region.second.z<<")"<<endl;
+	cout<<"--error:"<<error<<endl;
+					  
 
 	cout<<"======================\n";
 
@@ -706,8 +716,11 @@ cout<<"############### Tree Generation #################"<<endl;
 	cout<<"tree generation time:"<<((float)t1)/CLOCKS_PER_SEC<<endl;
 	// dg.BFS();
 	// cout<<x1<<","<<y1<<","<<z1<<","<<x2<<","<<y2<<","<<z2<<endl;
+clock_t qt = clock(); 
 size_t R1 = dg.query_base(query_region.first.x,query_region.first.y,query_region.
 				first.z,query_region.second.x,query_region.second.y,query_region.second.z);
+qt = clock()-qt;
+cout<<"\nquery time:"<<qt<<endl;
 
 cout<<"\n#################################################"<<endl;	
 cout<<"exact query result:"<<R1<<endl;
@@ -722,11 +735,11 @@ cout<<"preparing Aggregate-Tree for Bitmap Generation"<<endl;
 cout<<"\n#################################################"<<endl;	
 ////######################## Query Here! VVVVVVVV ############################
 	query_handler = new Query_interface("../data/bitmap/",dg.get_array(),dg.get_count(),dg.get_DimX(),dg.get_DimY(),dg.get_DimZ(),
-								&(aggregates->at(0)),aggregates->size(), Bit_representator);//generate the bitmaps ready to query
+								&(aggregates->at(0)),aggregates->size(), Bit_representator, error);//generate the bitmaps ready to query
 
 }
 else 
-    query_handler = new Query_interface(dimSize,dimSize,dimSize);
+    query_handler = new Query_interface(dimSize,dimSize,dimSize, error);
 
 // cout<<"here!!!\n";
 int result = query_handler->Query(query_region);

@@ -11,7 +11,7 @@ using namespace std;
  * the constructor function
  */
 template <class a_type> 
-Bitmap<a_type>::Bitmap(string dir,a_type* array, unsigned long items){
+Bitmap<a_type>::Bitmap(string dir,a_type* array, size_t items){
 	clock_t t0 = clock();
 	itemsCount = 0;// initially set the number of the items to 0
 	firstlevelvalue = new vector<struct index_bin>();// a vector of the the min and max values of the first level bins
@@ -25,7 +25,7 @@ Bitmap<a_type>::Bitmap(string dir,a_type* array, unsigned long items){
 	// first_level_bitmap = new vector<vector<vector<size_t>>>();
 	//##################################################
 	clock_t t1 = clock();
-	cout<< t1-t0<<endl;
+	// cout<< t1-t0<<endl;
 	//fetch the data block and initialize vector size
 	a_type * data_in = array;
 	//====== calculate the minimum and the maximum of the data (using a linear search)
@@ -42,7 +42,7 @@ Bitmap<a_type>::Bitmap(string dir,a_type* array, unsigned long items){
 			minvalue = data_in[i];
 	}
 	clock_t t2 = clock();
-	cout<< t2-t1<<endl;
+	// cout<< t2-t1<<endl;
 	//set the current precision(total number of low-level bins) based on value ranges
 	setPrecision();
 	
@@ -67,7 +67,7 @@ Bitmap<a_type>::Bitmap(string dir,a_type* array, unsigned long items){
 	}
 	// this part take a lot of time
 	clock_t t3 = clock();
-	cout<< t3-t2<<endl;
+	// cout<< t3-t2<<endl;
 	//============== calculate second_level_sums
 	for(auto elem: *varvalmap) {
 		int scaled_data = elem.first;
@@ -78,19 +78,19 @@ Bitmap<a_type>::Bitmap(string dir,a_type* array, unsigned long items){
 	}
 //////////////////////Generate the second-level(low-level) bitvectors/////////////////////
 	clock_t t4 = clock();
-	cout<< t4-t3<<endl;
+	// cout<< t4-t3<<endl;
 	for(int i=0; i<varvalmap->size(); i++) {
 		boost::dynamic_bitset<> tempvector(items);//////////////
-		cout<<bitvectors[i].size()<<endl;
+		// cout<<bitvectors[i].size()<<endl;
 		for(int j=0; j<bitvectors[i].size(); j++) {
 		  tempvector[bitvectors[i][j]] = 1;
 		}
-		cout<<"here compress"<<endl;
-
+		cout<<"compress bin"<<i<<"\t";
 		secondlevelvectors->push_back(Bitops.compressBitset(tempvector));
 	}
+	cout<<endl;
 	clock_t t5 = clock();
-	cout<< t5-t4<<endl;
+	// cout<< t5-t4<<endl;
 	/*int i=0;
 	for(auto bitvector:(*second_level_bitmap))
 	{
@@ -130,7 +130,7 @@ Bitmap<a_type>::Bitmap(string dir,a_type* array, unsigned long items){
 		k++;
 	}
 	clock_t t6 = clock();
-	cout<< t6-t5<<endl;
+	// cout<< t6-t5<<endl;
 	/*i=0;
 	for(auto bitvector:(*first_level_bitmap))
 	{
@@ -219,6 +219,8 @@ void Bitmap<a_type>:: calcPreAgg()
 		boost::dynamic_bitset<> uncompressed_bitvector = Bitops.uncompressIndex(vec,itemsCount);
 		s.count = uncompressed_bitvector.count();
 		s.sum = (*second_level_sums)[i];
+		s.min = -1;//TODO: calculate min for each bin
+		s.max = -1;//TODO: calculate max for each bin
 		second_level_statistics.push_back(s);
 		i++;
 		//cout<<s.count<<"vv	";
@@ -231,6 +233,8 @@ void Bitmap<a_type>:: calcPreAgg()
 		boost::dynamic_bitset<> uncompressed_bitvector = Bitops.uncompressIndex(vec,itemsCount);
 		s.count = uncompressed_bitvector.count();
 		s.sum = (*first_level_sums)[i];
+		s.min = -1;//TODO: calculate min for each bin
+		s.max = -1;//TODO: calculate max for each bin
 		first_level_statistics.push_back(s);
 		i++;
 		//cout<<s.count<<"gg	";
@@ -277,7 +281,7 @@ float  Bitmap<a_type>:: get_numpres()
 template <class a_type>
 vector<size_t> Bitmap<a_type>::get_firstlevelvector(int binNumber)
 {
-	return firstlevelvectors->at(binNumber);
+	return (*firstlevelvectors)[binNumber];
 }
 template <class a_type>
 vector<struct index_bin>*Bitmap<a_type>:: get_firstlevelvalue()
@@ -417,7 +421,7 @@ pair<int,int> * Bitmap<a_type>:: get_value(int node_number)
  * Find the cardinality of high-level bitmap indices (Omid: or number of high-level bins)
  */
 template <class a_type> 
-unsigned long Bitmap<a_type>::getL1Size() {
+size_t Bitmap<a_type>::getL1Size() {
   return firstlevelvectors->size();
 }
 
@@ -425,7 +429,7 @@ unsigned long Bitmap<a_type>::getL1Size() {
  * Find the cardinality of low-level bitmap indices(Omid: or number of low-level bins)
  */
 template <class a_type>
-unsigned long Bitmap<a_type>::getL2Size() {
+size_t Bitmap<a_type>::getL2Size() {
   return secondlevelvectors->size();
 }
 

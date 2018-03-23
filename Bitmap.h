@@ -39,7 +39,7 @@ private:
 ////################################ containers #############################################
 	float numpres;//numpres: The precision(number of low-level bins) of current variable==> a scaling factor
 	a_type minvalue,maxvalue;// minvalue and max value of the whole bitmap; 
-	unsigned long itemsCount;// number of items in the bitmap
+	size_t itemsCount;// number of items in the bitmap
 	map<int,int>* varvalmap;
 	vector<struct index_bin>* firstlevelvalue;// the bin boundaries (values are multiplied by numpres)
 	vector<vector<size_t>>* firstlevelvectors;// high-level bins
@@ -90,7 +90,7 @@ void load_first_level_statistics(string dir);
 
 public:
 	
-	Bitmap(string dir,a_type* array, unsigned long items);
+	Bitmap(string dir,a_type* array, size_t items);
 	Bitmap(string dir);
 	~Bitmap();	
 	/*making the pre-aggregation statistics*/
@@ -115,12 +115,12 @@ public:
 	/*
 	 * Find the cardinality of high-level bitmap indices (or number of high-level bins)
 	 */	
-	unsigned long getL1Size();
+	size_t getL1Size();
 	
 	/*
  	* Find the cardinality of low-level bitmap indices(or number of low-level bins)
  	*/
-	unsigned long getL2Size();
+	size_t getL2Size();
 	
 	/*get the bitmap maxval*/
 	int get_max();

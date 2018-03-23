@@ -700,7 +700,7 @@ vector<size_t> mybitops::compressBitset(const boost::dynamic_bitset<> dbitset) {
 }
 
 
-boost::dynamic_bitset<> mybitops::uncompressIndex(vector<size_t> cvector, unsigned long uncompressed_size){
+boost::dynamic_bitset<> mybitops::uncompressIndex(vector<size_t> cvector, size_t uncompressed_size){
   boost::dynamic_bitset<> bitvector(uncompressed_size);
   unsigned int mybit = 0;//current position
   for(vector<size_t>::iterator it=cvector.begin(); it!=cvector.end(); ++it) {

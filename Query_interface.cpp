@@ -1,5 +1,5 @@
 #include "Query_interface.h"
-Query_interface::Query_interface(string dir,size_t* array,unsigned long items, int DX,int DY, int DZ,size_t* aggregates, unsigned long aggregate_items, boost::dynamic_bitset<> BR){
+Query_interface::Query_interface(string dir,size_t* array,size_t items, int DX,int DY, int DZ,size_t* aggregates, size_t aggregate_items, boost::dynamic_bitset<> BR, int error){
 		
 		cout<<"Creating bitmap tree ...\n";
 		cout<<"items:"<<aggregate_items<<endl;		
@@ -15,14 +15,17 @@ Query_interface::Query_interface(string dir,size_t* array,unsigned long items, i
 		DimX = DX;
 		DimY = DY;
 		DimZ = DZ;
+        this->error = error;
+        
 	}
-Query_interface::Query_interface(int DX,int DY, int DZ)
+Query_interface::Query_interface(int DX,int DY, int DZ, int error)
 {
 	bitmapTree = new Bitmap<size_t>("../data/bitmap/bitmapTree/");
 	bitmap = new Bitmap<size_t>("../data/bitmap/bitmap/");
 	DimX = DX;
 	DimY = DY;
 	DimZ = DZ;
+    this->error = error;
 	// cout<<bitmap->get_count()<<"  "<<bitmapTree->get_count()<<endl;
 }
 Query_interface::~Query_interface(){
@@ -40,14 +43,13 @@ int Query_interface:: Query(pair<point,point> query_region){
 	root_region.second.x  = DimX-1;
 	root_region.second.y  = DimY-1;
 	root_region.second.z  = DimZ-1;	
-	
-	//k0=0;
-	//gtt = 0;
-	//clock_t tq = clock(); 
+
+	clock_t qt = clock(); 
 	int result = TreeQuery(query_region,0,root_region);
-	//gtt += clock()-tq;
-	//cout<<"\ngtt:"<<gtt<<endl;
-	//cout<<"# of getvals:"<<k0<<endl;
+	qt = clock()-qt;
+	cout<<"\nall query time:"<<qt<<endl;
+	cout<<"\nbitmap time:"<<tt<<endl;
+	
 	return result;
 
 }
@@ -76,9 +78,10 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 	// node_region.first.print();
 	// node_region.second.print();
 	
-	//// if(match(query,region))
-	if(query_region == node_region) // base case: if the query region match the node area
-	{
+	// if(query_region-node_region<=10)
+	// if(query_region == node_region) // base case: if the query region match the node area
+	if(match(query_region, node_region,error))
+    {
 		
 		//clock_t tq = clock(); /////bottle neck!!!!!!!!!!!!!!!!!!!!
 		pair<int,int>* node_min_max = bitmapTree->get_value(node_number);// get the bin statistic e.g. : [min:2,max: 10]
@@ -491,11 +494,39 @@ pair<point, point>* Query_interface::TreeOverlap(pair<point, point> query_region
 	return result;
 	
 }
+bool Query_interface::match(pair<point, point> query_region,pair<point, point> node_region, int error)
+{	
+	int X1 = node_region.first.x;
+	int Y1 = node_region.first.y;
+	int Z1 = node_region.first.z;
+	
+	int X2 = node_region.second.x;
+	int Y2 = node_region.second.y;
+	int Z2 = node_region.second.z;
+
+	int x1 = query_region.first.x;
+	int y1 = query_region.first.y;
+	int z1 = query_region.first.z;
+
+	int x2 = query_region.second.x;
+	int y2 = query_region.second.y;
+	int z2 = query_region.second.z;
+    return((abs(X1-x1)<=error) && 
+           (abs(X2-x2)<=error) &&
+           (abs(Y1-y1)<=error) &&
+           (abs(Y2-y2)<=error) &&
+           (abs(Z1-z1)<=error) &&
+           (abs(Z2-z2)<=error)
+           );
+}
 float Query_interface::BitmapQuery(vector<pair<int, int>> Pv, vector<pair<int, int>> Pdx,vector<pair<int, int>> Pdy, vector<pair<int, int>> Pdz)
 {
+	
 	// cout<<"bitmap\n";
 	total_acccess++;
 	bitmap_access++;
+	// cout<<bitmap_access<<endl;
+    
 	//============== value based filtering; lines 1-7 in 2015 paper algo.
 	vector<int> value_based_filtered_bins;
 	int i = 0;
@@ -507,29 +538,42 @@ float Query_interface::BitmapQuery(vector<pair<int, int>> Pv, vector<pair<int, i
 		}
 		i++;
 	}
+	
 	// assert(false);
 	//============== dimension based filtering ; lines 9-15 in 2015 paper algo.
-	
 	//cout<<"here3"<<Pdx[0].first<<","<<Pdx[0].second<<Pdy[0].first<<","<<Pdy[0].second<<endl;
-	vector<size_t> transalted_pd = translate(Pdx, Pdy,Pdz);
+	vector<size_t> transalted_pd = translate(Pdx, Pdy,Pdz); /// 20% of clock cycles
 	// assert(false);
-
+	
 	//for(auto w:transalted_pd)
 		//cout<<w;
 	//cout<<endl;
+	
 	unordered_map<int,int>* count_array = new unordered_map<int,int>;
 	// cout<<value_based_filtered_bins.size();
-	for(int bin_number:value_based_filtered_bins)
+
+	//// bottleneck here!!!!!!!!!!!!!!!! 
+	// int ind = 0; 	
+	for(int bin_number:value_based_filtered_bins)//// 80% of clock cycles
 	{
-		vector<size_t> result = Bitops.logic_and(bitmap->get_firstlevelvector(bin_number),transalted_pd); // make sure to do it by reference
+		// clock_t bt = clock();
+		
+		vector<size_t> t = bitmap->get_firstlevelvector(bin_number);
+		// bt = clock()-bt;
+		// tt+=bt;
+		// cout<<"start and "<<ind<<endl;
+		vector<size_t> result = Bitops.logic_and_ref(t,transalted_pd); // make sure to do it by reference
+		// cout<<endl;
+        // ind++;
+		
+
 		boost::dynamic_bitset<> bit_result = Bitops.uncompressIndex(result, bitmap->get_count());// unefficient!!
 		count_array->insert(pair<int, int> (bin_number,bit_result.count()));  // uses the boost's count function
 	}
-	// assert(false);
-	//for (auto elem:*count_array)
-		//cout<<"bin"<<elem.first<<" count:"<<elem.second<<"	";
+	
+	////!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	float approx_sum = approximate_sum(count_array);
-	//cout<<"approx sum:"<<approx_sum<<endl;
+	
 	return approx_sum;
 }
 
