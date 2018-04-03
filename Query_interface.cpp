@@ -45,18 +45,50 @@ int Query_interface:: Query(pair<point,point> query_region){
 	root_region.second.z  = DimZ-1;	
 
 	clock_t qt = clock(); 
-	int result = TreeQuery(query_region,0,root_region);
+	int result = 0;
+	if(isThinQuery(query_region, thinness_ratio))
+	{
+		vector<pair<int, int>> Pv; 
+		Pv.push_back(pair<int, int>(-100000,100000)); // skip the value_based filtering
+		vector<pair<int, int>> Pdx; 
+		Pdx.push_back(pair<int, int>(query_region.first.x ,query_region.second.x)); 
+		vector<pair<int, int>> Pdy; 
+		Pdy.push_back(pair<int, int>(query_region.first.y ,query_region.second.y)); 
+		vector<pair<int, int>> Pdz; 
+		Pdz.push_back(pair<int, int>(query_region.first.z ,query_region.second.z)); 
+		result = BitmapQuery(Pv,Pdx,Pdy,Pdz);
+	}
+	else
+		result = TreeQuery(query_region,0,root_region);
 	qt = clock()-qt;
 	cout<<"\nall query time:"<<qt<<endl;
-	cout<<"\nbitmap time:"<<tt<<endl;
+	cout<<"bitmap time:"<<tt<<endl;
 	
 	return result;
 
 }
+bool Query_interface::isThinQuery(pair<point,point> query_region,float ratio)
+{
+	// if the width/length ratio is less ratio it returns false. O.w true.
+	float x_len = abs( query_region.first.x - query_region.second.x );
+	float y_len = abs( query_region.first.y - query_region.second.y );
+	float z_len = abs( query_region.first.z - query_region.second.z );
+
+
+	if(x_len/y_len < ratio || x_len/z_len < ratio || y_len/z_len < ratio ||
+	   y_len/x_len < ratio || z_len/x_len < ratio || z_len/y_len < ratio)
+	{
+	   query_region.first.print();
+	   query_region.second.print();	   
+	   cout<<"thin region:("<<x_len<<","<<y_len<<","<<z_len<<")\n";
+	   return true;
+	}
+	else
+		return false;	
+}
 
 int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, pair<point, point> node_region){
 
-	//  cout<<"tree query\n";
 	int X1 = node_region.first.x;
 	int Y1 = node_region.first.y;
 	int Z1 = node_region.first.z;
@@ -72,6 +104,7 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 	int x2 = query_region.second.x;
 	int y2 = query_region.second.y;
 	int z2 = query_region.second.z;
+	cout<<"tree query:("<<x1<<","<<y1<<","<<z1<<")("<<x2<<","<<y2<<","<<z2<<")\n";	
 	// query_region.first.print();
 	// query_region.second.print();
 	
@@ -91,7 +124,7 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 		// cout<<"tree\n";	
 		total_acccess++;
 		tree_access++;
-		
+		cout<<"tree subquery result:"<<node_value<<endl;
 		return node_value;
 	}	
 
@@ -218,12 +251,20 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 		//first_child_region->second.first<<","<<first_child_region->second.second<<endl;
 	if(a1!=NULL)
 	{		
-		if(first_child>0) // if the first_child exists
+		if(first_child>0 && !isThinQuery(*a1, thinness_ratio)) // if the first_child exists
 		{
 			r1 = TreeQuery(*a1, first_child,first_child_region);
 		}
 		else
 		{
+			int x1 = a1->first.x;
+			int y1 = a1->first.y;
+			int z1 = a1->first.z;
+
+			int x2 = a1->second.x;
+			int y2 = a1->second.y;
+			int z2 = a1->second.z;
+			
 			vector<pair<int, int>> Pv; 
 			Pv.push_back(pair<int, int>(-100000,100000)); // skip the value_based filtering
 			vector<pair<int, int>> Pdx; 
@@ -233,7 +274,7 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 			vector<pair<int, int>> Pdz; 
 			Pdz.push_back(pair<int, int>(z1,z2)); 
 			// cout<<"bitmap query:"<<a1->first.first<<","<<a1->first.second<<","<<a1->second.first<<","<<a1->second.second<<","<<endl;
-			return  BitmapQuery(Pv,Pdx,Pdy,Pdz);
+			r1 =  BitmapQuery(Pv,Pdx,Pdy,Pdz);
 		}
 	}
 	// cout<<"come on1\n";
@@ -243,13 +284,19 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 	
 	if(a2!=NULL)
 	{
-		if(second_child>0) // if the second_child exists
+		if(second_child>0&& !isThinQuery(*a2, thinness_ratio)) // if the second_child exists
 		{
 			r2 = TreeQuery(*a2, second_child,second_child_region);
 		}
 		else
 		{
-			
+			int x1 = a2->first.x;
+			int y1 = a2->first.y;
+			int z1 = a2->first.z;
+
+			int x2 = a2->second.x;
+			int y2 = a2->second.y;
+			int z2 = a2->second.z;
 			vector<pair<int, int>> Pv; 
 			Pv.push_back(pair<int, int>(-100000,100000)); // skip the value_based filtering
 			vector<pair<int, int>> Pdx; 
@@ -259,7 +306,7 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 			vector<pair<int, int>> Pdz; 
 			Pdz.push_back(pair<int, int>(z1,z2)); 
 			// cout<<"bitmap query:"<<a1->first.first<<","<<a1->first.second<<","<<a1->second.first<<","<<a1->second.second<<","<<endl;
-			return  BitmapQuery(Pv,Pdx,Pdy,Pdz);
+			r2 =  BitmapQuery(Pv,Pdx,Pdy,Pdz);
 			
 		}
 	}
@@ -269,12 +316,19 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 		//third_child_region->second.first<<","<<third_child_region->second.second<<endl;
 	if(a3!=NULL)
 	{
-		if(third_child>0) // if the third_child exists
+		if(third_child>0&& !isThinQuery(*a3, thinness_ratio)) // if the third_child exists
 		{		
 			r3 = TreeQuery(*a3, third_child,third_child_region);
 		}
 		else
 		{
+			int x1 = a3->first.x;
+			int y1 = a3->first.y;
+			int z1 = a3->first.z;
+
+			int x2 = a3->second.x;
+			int y2 = a3->second.y;
+			int z2 = a3->second.z;
 			vector<pair<int, int>> Pv; 
 			Pv.push_back(pair<int, int>(-100000,100000)); // skip the value_based filtering
 			vector<pair<int, int>> Pdx; 
@@ -284,7 +338,7 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 			vector<pair<int, int>> Pdz; 
 			Pdz.push_back(pair<int, int>(z1,z2)); 
 			// cout<<"bitmap query:"<<a1->first.first<<","<<a1->first.second<<","<<a1->second.first<<","<<a1->second.second<<","<<endl;
-			return  BitmapQuery(Pv,Pdx,Pdy,Pdz);
+			r3 =  BitmapQuery(Pv,Pdx,Pdy,Pdz);
 		}
 	}
 	// cout<<"come on3\n";
@@ -293,12 +347,19 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 		//forth_child_region->second.first<<","<<forth_child_region->second.second<<endl;
 	if(a4!=NULL)
 	{
-		if(forth_child>0) // if the fourth_child exists
+		if(forth_child>0&& !isThinQuery(*a4, thinness_ratio)) // if the fourth_child exists
 		{	
 			r4= TreeQuery(*a4, forth_child,forth_child_region);
 		}
 		else
 		{
+			int x1 = a4->first.x;
+			int y1 = a4->first.y;
+			int z1 = a4->first.z;
+
+			int x2 = a4->second.x;
+			int y2 = a4->second.y;
+			int z2 = a4->second.z;
 			vector<pair<int, int>> Pv; 
 			Pv.push_back(pair<int, int>(-100000,100000)); // skip the value_based filtering
 			vector<pair<int, int>> Pdx; 
@@ -308,7 +369,7 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 			vector<pair<int, int>> Pdz; 
 			Pdz.push_back(pair<int, int>(z1,z2)); 
 			// cout<<"bitmap query:"<<a1->first.first<<","<<a1->first.second<<","<<a1->second.first<<","<<a1->second.second<<","<<endl;
-			return  BitmapQuery(Pv,Pdx,Pdy,Pdz);
+			r4 = BitmapQuery(Pv,Pdx,Pdy,Pdz);
 		}	
 	}
 	// cout<<"come on4\n";
@@ -317,12 +378,19 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 		//forth_child_region->second.first<<","<<forth_child_region->second.second<<endl;
 	if(a5!=NULL)
 	{
-		if(fifth_child>0) // if the fourth_child exists
+		if(fifth_child>0&& !isThinQuery(*a5, thinness_ratio)) // if the fourth_child exists
 		{	
 			r5= TreeQuery(*a5, fifth_child,fifth_child_region);
 		}
 		else
 		{
+			int x1 = a5->first.x;
+			int y1 = a5->first.y;
+			int z1 = a5->first.z;
+
+			int x2 = a5->second.x;
+			int y2 = a5->second.y;
+			int z2 = a5->second.z;
 			vector<pair<int, int>> Pv; 
 			Pv.push_back(pair<int, int>(-100000,100000)); // skip the value_based filtering
 			vector<pair<int, int>> Pdx; 
@@ -332,7 +400,7 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 			vector<pair<int, int>> Pdz; 
 			Pdz.push_back(pair<int, int>(z1,z2)); 
 			// cout<<"bitmap query:"<<a1->first.first<<","<<a1->first.second<<","<<a1->second.first<<","<<a1->second.second<<","<<endl;
-			return  BitmapQuery(Pv,Pdx,Pdy,Pdz);
+			r5 =  BitmapQuery(Pv,Pdx,Pdy,Pdz);
 		}	
 	}
 	// cout<<"come on5\n";
@@ -341,12 +409,19 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 		//second_child_region->second.first<<","<<second_child_region->second.second<<endl;
 	if(a6!=NULL)
 	{
-		if(sixth_child>0) // if the second_child exists
+		if(sixth_child>0&& !isThinQuery(*a6, thinness_ratio)) // if the second_child exists
 		{
 			r6 = TreeQuery(*a6, sixth_child,sixth_child_region);
 		}
 		else
 		{
+			int x1 = a6->first.x;
+			int y1 = a6->first.y;
+			int z1 = a6->first.z;
+
+			int x2 = a6->second.x;
+			int y2 = a6->second.y;
+			int z2 = a6->second.z;
 			vector<pair<int, int>> Pv; 
 			Pv.push_back(pair<int, int>(-100000,100000)); // skip the value_based filtering
 			vector<pair<int, int>> Pdx; 
@@ -356,7 +431,7 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 			vector<pair<int, int>> Pdz; 
 			Pdz.push_back(pair<int, int>(z1,z2)); 
 			// cout<<"bitmap query:"<<a1->first.first<<","<<a1->first.second<<","<<a1->second.first<<","<<a1->second.second<<","<<endl;
-			return  BitmapQuery(Pv,Pdx,Pdy,Pdz);
+			r6 = BitmapQuery(Pv,Pdx,Pdy,Pdz);
 			
 		}
 	}
@@ -366,12 +441,19 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 		//third_child_region->second.first<<","<<third_child_region->second.second<<endl;
 	if(a7!=NULL)
 	{
-		if(seventh_child>0) // if the third_child exists
+		if(seventh_child>0&& !isThinQuery(*a7, thinness_ratio)) // if the third_child exists
 		{		
 			r7 = TreeQuery(*a7, seventh_child,seventh_child_region);
 		}
 		else
 		{
+			int x1 = a7->first.x;
+			int y1 = a7->first.y;
+			int z1 = a7->first.z;
+
+			int x2 = a7->second.x;
+			int y2 = a7->second.y;
+			int z2 = a7->second.z;
 			vector<pair<int, int>> Pv; 
 			Pv.push_back(pair<int, int>(-100000,100000)); // skip the value_based filtering
 			vector<pair<int, int>> Pdx; 
@@ -381,7 +463,7 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 			vector<pair<int, int>> Pdz; 
 			Pdz.push_back(pair<int, int>(z1,z2)); 
 			// cout<<"bitmap query:"<<a1->first.first<<","<<a1->first.second<<","<<a1->second.first<<","<<a1->second.second<<","<<endl;
-			return  BitmapQuery(Pv,Pdx,Pdy,Pdz);
+			r7 = BitmapQuery(Pv,Pdx,Pdy,Pdz);
 		}
 	}
 	// cout<<"come on7\n";
@@ -390,12 +472,19 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 		//forth_child_region->second.first<<","<<forth_child_region->second.second<<endl;
 	if(a8!=NULL)
 	{
-		if(eighth_child>0) // if the fourth_child exists
+		if(eighth_child>0&& !isThinQuery(*a8, thinness_ratio)) // if the fourth_child exists
 		{	
 			r8 = TreeQuery(*a8, eighth_child,eighth_child_region);
 		}
 		else
 		{
+			int x1 = a8->first.x;
+			int y1 = a8->first.y;
+			int z1 = a8->first.z;
+
+			int x2 = a8->second.x;
+			int y2 = a8->second.y;
+			int z2 = a8->second.z;
 			vector<pair<int, int>> Pv; 
 			Pv.push_back(pair<int, int>(-100000,100000)); // skip the value_based filtering
 			vector<pair<int, int>> Pdx; 
@@ -405,7 +494,7 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 			vector<pair<int, int>> Pdz; 
 			Pdz.push_back(pair<int, int>(z1,z2)); 
 			// cout<<"bitmap query:"<<a1->first.first<<","<<a1->first.second<<","<<a1->second.first<<","<<a1->second.second<<","<<endl;
-			return  BitmapQuery(Pv,Pdx,Pdy,Pdz);
+			r8 = BitmapQuery(Pv,Pdx,Pdy,Pdz);
 		}	
 	}
 	// cout<<"come on8\n";
@@ -519,10 +608,14 @@ bool Query_interface::match(pair<point, point> query_region,pair<point, point> n
            (abs(Z2-z2)<=error)
            );
 }
+
 float Query_interface::BitmapQuery(vector<pair<int, int>> Pv, vector<pair<int, int>> Pdx,vector<pair<int, int>> Pdy, vector<pair<int, int>> Pdz)
 {
 	
+	cout<<"bitmap query:("<<Pdx[0].first<<","<<Pdy[0].first<<","<<Pdz[0].first<<")("<<Pdx[0].second<<","<<Pdy[0].second<<","<<Pdz[0].second<<")\n";	
 	// cout<<"bitmap\n";
+	clock_t bt = clock();		
+	
 	total_acccess++;
 	bitmap_access++;
 	// cout<<bitmap_access<<endl;
@@ -552,28 +645,24 @@ float Query_interface::BitmapQuery(vector<pair<int, int>> Pv, vector<pair<int, i
 	unordered_map<int,int>* count_array = new unordered_map<int,int>;
 	// cout<<value_based_filtered_bins.size();
 
-	//// bottleneck here!!!!!!!!!!!!!!!! 
-	// int ind = 0; 	
+	//// bottleneck here. AND_OP takes most of the cycles!!!!!!!!!!!!!!!! 
 	for(int bin_number:value_based_filtered_bins)//// 80% of clock cycles
 	{
-		// clock_t bt = clock();
 		
 		vector<size_t> t = bitmap->get_firstlevelvector(bin_number);
-		// bt = clock()-bt;
-		// tt+=bt;
-		// cout<<"start and "<<ind<<endl;
-		vector<size_t> result = Bitops.logic_and_ref(t,transalted_pd); // make sure to do it by reference
-		// cout<<endl;
-        // ind++;
 		
+		vector<size_t> result = Bitops.logic_and_ref(t,transalted_pd);
 
-		boost::dynamic_bitset<> bit_result = Bitops.uncompressIndex(result, bitmap->get_count());// unefficient!!
-		count_array->insert(pair<int, int> (bin_number,bit_result.count()));  // uses the boost's count function
+		
+		count_array->insert(pair<int, int> (bin_number,Bitops.count_ones(result)));
+		
 	}
 	
 	////!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	float approx_sum = approximate_sum(count_array);
-	
+	bt = clock()-bt;
+	cout<<"@@@@@@@@"<<bt<<endl;
+	tt+=bt;
 	return approx_sum;
 }
 
@@ -651,6 +740,6 @@ void Query_interface::print_access_log()
 {
 	cout<<"================ access report ===================\n";
 	cout<<"number of total access to both bitmaps: "<<total_acccess<<endl;
-	cout<<"Actual bitmap access ratio: "<<float(bitmap_access)/float(total_acccess)<<endl;
-	cout<<"Bitmap tree access ratio: "<<float(tree_access)/float(total_acccess)<<endl;	
+	cout<<"Actual bitmap access ratio: "<<float(bitmap_access)<<endl;
+	cout<<"Bitmap tree access ratio: "<<float(tree_access)<<endl;	
 }

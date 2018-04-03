@@ -42,7 +42,8 @@ class mybitops{
 	 * Part of the WAH algorithm
 	 * Check if the current word is a fill word or a literal word
 	 */ 
-	 int ismyfill(size_t word1);
+	int count_ones(vector<size_t> &vec);
+	int ismyfill(size_t word1);
 	 /*
 	  * return the word type
 	  * 0:

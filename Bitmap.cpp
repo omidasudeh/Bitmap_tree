@@ -6,7 +6,7 @@
 using namespace std;
 #define DebugMode false// generate more text
 #define TRACE false // to debug the node number to child bitmap tree index
-#define SET_PREC false // set_precision()
+#define SET_PREC true // set_precision()
 /*
  * the constructor function
  */
@@ -167,7 +167,6 @@ template <class a_type>
 Bitmap<a_type>::~Bitmap() {
 	// TODO Auto-generated destructor stub
 	delete firstlevelvalue;
-	delete varvalmap;
 	delete firstlevelvectors;
 	delete secondlevelvectors;
 }
@@ -474,13 +473,6 @@ void Bitmap<a_type>:: print_first_level_uncompressed_vectors()
 	}		
 }
 
-template <class a_type>
-void Bitmap<a_type>:: print_varvalmap()
-{
-	for(auto elem: *varvalmap)
-		cout<<"key:"<<elem.first<<", val: "<<elem.second<<endl;
-}
-	
 template <class a_type>
 void Bitmap<a_type>:: print_second_level_uncompressed_vectors()
 {

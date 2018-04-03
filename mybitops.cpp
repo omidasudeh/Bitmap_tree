@@ -864,3 +864,18 @@ void mybitops::test_count()
 	cout<<"\n";
 
 }
+int mybitops::count_ones(vector<size_t>& vec)
+{
+  int result = 0;
+	for(auto word :vec)
+  {
+    if(word_type(word)==2)
+      result+=( word & 0x3fffffff);     
+    else if(word_type(word)==0)
+    {
+      boost::dynamic_bitset<> word_bits(32, word);
+      result+=(word_bits.count());
+    }
+	}
+  return result;
+}

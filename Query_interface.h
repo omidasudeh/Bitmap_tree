@@ -3,6 +3,8 @@
 
 #include "Bitmap.h"
 using namespace std;
+#define thinness_ratio 1 
+// as we decrease thinness_ratio the actual bitmap access increase fast, but the tree access increase slow
 struct point
 {
 	int x = 0;
@@ -58,7 +60,7 @@ class Query_interface {
 		int  bitmap_tree_index(int node_number);
 		pair<point,point>*TreeOverlap(pair<point, point> query_region,pair<point, point> node_region);
 		bool match(pair<point, point> query_region,pair<point, point> node_region, int error);
-		
+		bool isThinQuery(pair<point,point> query_region, float ratio);
 		///=================================================
 		////###################### Reporting ######################
 		int total_acccess = 0;
