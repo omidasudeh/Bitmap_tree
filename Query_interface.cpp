@@ -1,4 +1,5 @@
 #include "Query_interface.h"
+#include <omp.h>
 Query_interface::Query_interface(string dir,size_t* array,size_t items, int DX,int DY, int DZ,size_t* aggregates, size_t aggregate_items, boost::dynamic_bitset<> BR, int error){
 		
 		cout<<"Creating bitmap tree ...\n";
@@ -616,7 +617,6 @@ bool Query_interface::match(pair<point, point> query_region,pair<point, point> n
 
 float Query_interface::BitmapQuery(vector<pair<int, int>> Pv, vector<pair<int, int>> Pdx,vector<pair<int, int>> Pdy, vector<pair<int, int>> Pdz)
 {
-	
 	// cout<<"bitmap query:("<<Pdx[0].first<<","<<Pdy[0].first<<","<<Pdz[0].first<<")("<<Pdx[0].second<<","<<Pdy[0].second<<","<<Pdz[0].second<<")\n";	
 	// cout<<"bitmap\n";
 	clock_t bt = clock();		
@@ -626,6 +626,7 @@ float Query_interface::BitmapQuery(vector<pair<int, int>> Pv, vector<pair<int, i
 	// cout<<bitmap_access<<endl;
     
 	//============== value based filtering; lines 1-7 in 2015 paper algo.
+	
 	vector<int> value_based_filtered_bins;
 	int i = 0;
 	for(auto bin:*(bitmap->get_firstlevelvalue()))
@@ -647,22 +648,31 @@ float Query_interface::BitmapQuery(vector<pair<int, int>> Pv, vector<pair<int, i
 		//cout<<w;
 	//cout<<endl;
 	
-	unordered_map<int,int>* count_array = new unordered_map<int,int>;
+	unordered_map<int,int>* count_array = new unordered_map<int,int>; // reserve!!!!
 	// cout<<value_based_filtered_bins.size();
 
 	//// bottleneck here. AND_OP takes most of the cycles!!!!!!!!!!!!!!!! 
-	for(int bin_number:value_based_filtered_bins)//// 80% of clock cycles
-	{
-		
-		vector<size_t> t = bitmap->get_firstlevelvector(bin_number);
-		
-		vector<size_t> result = Bitops.logic_and_ref(t,transalted_pd);
-
-		
-		count_array->insert(pair<int, int> (bin_number,Bitops.count_ones(result)));
-		
+	int NUM_THREADS = value_based_filtered_bins.size();
+    omp_set_num_threads(NUM_THREADS);	
+    #pragma  omp parallel 
+	{	
+    	size_t actual_num_threads = omp_get_num_threads(); 	
+		// cout<<"requested number of threads:"<<NUM_THREADS<<"actual number of threads:" <<actual_num_threads<<endl;	
+		////@@@@@@@@@@@@@@@@@@@@@@ 1. get the thread info @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    	int tid; 
+		tid = omp_get_thread_num();// query the current thread id	
+		int start_bin = tid*value_based_filtered_bins.size()/actual_num_threads;
+		int end_bin = (tid+1)*value_based_filtered_bins.size()/actual_num_threads-1;
+		if (tid == actual_num_threads-1) // last thread takes care of remaining bins
+			end_bin = value_based_filtered_bins.size()-1;
+		for(int bin_number = start_bin;bin_number<=end_bin;bin_number++)
+		//for(int bin_number:value_based_filtered_bins)//// 80% of clock cycles
+		{
+			vector<size_t> t = bitmap->get_firstlevelvector(bin_number);
+			vector<size_t> result = Bitops.logic_and_ref(t,transalted_pd);
+			count_array->insert(pair<int, int> (bin_number,Bitops.count_ones(result)));// there should not be any race condition here since each thread work on non-overlappng bins
+		}
 	}
-	
 	////!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	float approx_sum = approximate_sum(count_array);
 	bt = clock()-bt;
