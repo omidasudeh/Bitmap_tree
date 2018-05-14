@@ -3,8 +3,7 @@
 
 #include "Bitmap.h"
 using namespace std;
-#define thinness_ratio 1 
-// as we decrease thinness_ratio the actual bitmap access increase fast, but the tree access increase slow
+#define thinness_ratio .5 // as we decrease thinness_ratio the actual bitmap access increase fast, but the tree access increase slow
 struct point
 {
 	int x = 0;

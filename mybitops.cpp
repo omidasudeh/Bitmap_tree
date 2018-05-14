@@ -213,7 +213,10 @@ using namespace std;
 
  vector<size_t> mybitops::logic_and_ref(vector<size_t> &vector1, vector<size_t> &vector2) {
   int ones = 0, zeros = 0;
+  size_t smaller_vec_size = (vector1.size()<vector2.size())?vector1.size():vector2.size();  
+  // vector<size_t> result_vector(smaller_vec_size);
   vector<size_t> result_vector;
+  result_vector.reserve(smaller_vec_size);
   vector<size_t>::iterator it1 = vector1.begin();
   vector<size_t>::iterator it2 = vector2.begin();
   size_t word1 = (*it1);

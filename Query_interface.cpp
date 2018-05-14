@@ -35,6 +35,10 @@ Query_interface::~Query_interface(){
 
 int Query_interface:: Query(pair<point,point> query_region){
 	// pair<point, point>* root_region = new pair<point,point>;
+	total_acccess = 0;
+	tree_access = 0;
+	bitmap_access = 0;
+
 	pair<point, point> root_region;
 	root_region.first.x   = 0;
 	root_region.first.y   = 0;
@@ -78,9 +82,9 @@ bool Query_interface::isThinQuery(pair<point,point> query_region,float ratio)
 	if(x_len/y_len < ratio || x_len/z_len < ratio || y_len/z_len < ratio ||
 	   y_len/x_len < ratio || z_len/x_len < ratio || z_len/y_len < ratio)
 	{
-	   query_region.first.print();
-	   query_region.second.print();	   
-	   cout<<"thin region:("<<x_len<<","<<y_len<<","<<z_len<<")\n";
+	//    query_region.first.print();
+	//    query_region.second.print();	   
+	//    cout<<"thin region:("<<x_len<<","<<y_len<<","<<z_len<<")\n";
 	   return true;
 	}
 	else
@@ -104,7 +108,8 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 	int x2 = query_region.second.x;
 	int y2 = query_region.second.y;
 	int z2 = query_region.second.z;
-	cout<<"tree query:("<<x1<<","<<y1<<","<<z1<<")("<<x2<<","<<y2<<","<<z2<<")\n";	
+	// cout<<"tree query:("<<x1<<","<<y1<<","<<z1<<")("<<x2<<","<<y2<<","<<z2<<")\n";	
+
 	// query_region.first.print();
 	// query_region.second.print();
 	
@@ -124,7 +129,7 @@ int  Query_interface::TreeQuery(pair<point,point> query_region,int node_number, 
 		// cout<<"tree\n";	
 		total_acccess++;
 		tree_access++;
-		cout<<"tree subquery result:"<<node_value<<endl;
+		// cout<<"tree subquery result:"<<node_value<<endl;
 		return node_value;
 	}	
 
@@ -612,7 +617,7 @@ bool Query_interface::match(pair<point, point> query_region,pair<point, point> n
 float Query_interface::BitmapQuery(vector<pair<int, int>> Pv, vector<pair<int, int>> Pdx,vector<pair<int, int>> Pdy, vector<pair<int, int>> Pdz)
 {
 	
-	cout<<"bitmap query:("<<Pdx[0].first<<","<<Pdy[0].first<<","<<Pdz[0].first<<")("<<Pdx[0].second<<","<<Pdy[0].second<<","<<Pdz[0].second<<")\n";	
+	// cout<<"bitmap query:("<<Pdx[0].first<<","<<Pdy[0].first<<","<<Pdz[0].first<<")("<<Pdx[0].second<<","<<Pdy[0].second<<","<<Pdz[0].second<<")\n";	
 	// cout<<"bitmap\n";
 	clock_t bt = clock();		
 	
@@ -661,7 +666,7 @@ float Query_interface::BitmapQuery(vector<pair<int, int>> Pv, vector<pair<int, i
 	////!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	float approx_sum = approximate_sum(count_array);
 	bt = clock()-bt;
-	cout<<"@@@@@@@@"<<bt<<endl;
+	// cout<<"@@@@@@@@"<<bt<<endl;
 	tt+=bt;
 	return approx_sum;
 }

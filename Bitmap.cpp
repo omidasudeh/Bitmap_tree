@@ -6,7 +6,7 @@
 using namespace std;
 #define DebugMode false// generate more text
 #define TRACE false // to debug the node number to child bitmap tree index
-#define SET_PREC true // set_precision()
+#define SET_PREC true // set_precision() rounds the data points
 /*
  * the constructor function
  */

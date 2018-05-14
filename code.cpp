@@ -742,9 +742,29 @@ else
     query_handler = new Query_interface(dimSize,dimSize,dimSize, error);
 
 // cout<<"here!!!\n";
-int result = query_handler->Query(query_region);
-cout<<"combined result:"<<result<<endl;
-query_handler->print_access_log();
+for(int i = 0; i< 32;i++)
+{
+	pair<point,point> query_region;
+	srand(time(NULL));
+	int x1 = rand()%dimSize;
+	int y1 = rand()%dimSize;
+	int z1 = rand()%dimSize;
+	query_region.first.x = x1;
+	query_region.first.y = y1;
+	query_region.first.z = z1;
+	query_region.second.x = x1+rand()%(dimSize-x1);
+	query_region.second.y = y1+rand()%(dimSize-y1);;
+	query_region.second.z = z1+rand()%(dimSize-z1);;
+
+
+	cout<<"query:("<<x1<<","<<y1<<","<<z1<<")("<<query_region.second.x<<","<<query_region.second.y<<","<<query_region.second.z<<")"<<endl;
+	int result = query_handler->Query(query_region);
+	cout<<"combined result:"<<result<<endl;
+	query_handler->print_access_log();
+
+	cout<<"====================\n";
+
+}
 
 
 return 0;

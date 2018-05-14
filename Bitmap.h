@@ -11,7 +11,7 @@
 #include "mybitops.h"
 #include <vector>
 
-#define BIN_INTERVAL 1
+#define BIN_INTERVAL 1 // bin merge factor. 2 means every 2 bins merge to one
 using namespace std;
 /* Noise Value should be smaller than this value, only for ocean data */
 //#define NOISE_VALUE_LOW  -100000000000
